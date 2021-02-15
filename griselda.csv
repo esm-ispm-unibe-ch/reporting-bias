@@ -1,0 +1,394 @@
+id,study,t,n,r
+8,Hale2010 (CL3-20098-045),agomelatine,252,177
+8,Hale2010 (CL3-20098-045),fluoxetine,263,164
+10,Montgomery2004b (CL3-20098-030),agomelatine,167,106
+10,Montgomery2004b (CL3-20098-030),paroxetine,168,120
+11,CL3-20098-036,agomelatine,137,113
+11,CL3-20098-036,venlafaxine,140,111
+12,CL3-20098-048,agomelatine,213,127
+12,CL3-20098-048,paroxetine,199,118
+13,"Shu2014 (CL3-20098-052, ChiCTR-TRC-11001668) ",agomelatine,314,205
+13,"Shu2014 (CL3-20098-052, ChiCTR-TRC-11001668) ",fluoxetine,314,209
+14,"
+Quera-Salva2010 (CL3-20098-056)",agomelatine,71,44
+14,"
+Quera-Salva2010 (CL3-20098-056)",escitalopram,67,36
+15,CL3-20098-062,agomelatine,202,131
+15,CL3-20098-062,duloxetine,216,153
+16,Corruble2013 (CL3-20098-063),agomelatine,164,134
+16,Corruble2013 (CL3-20098-063),escitalopram,160,128
+19,Lemoine2007 (CL3-20098-035),agomelatine,165,126
+19,Lemoine2007 (CL3-20098-035),venlafaxine,167,115
+48,Chouinard1983a,amitriptyline,41,*
+48,Chouinard1983a,bupropion,77,*
+52,Feighner1991,fluoxetine,62,35
+52,Feighner1991,bupropion,61,37
+53,Weisler1994,bupropion,63,33
+53,Weisler1994,trazodone,61,21
+59,Caligiuri2003,bupropion,7,3
+59,Caligiuri2003,sertraline,9,4
+61,Thase2006 (WELL 100368),bupropion,171,86
+61,Thase2006 (WELL 100368),venlafaxine,177,82
+75,WELL AK140016,bupropion,69,35
+75,WELL AK140016,paroxetine,71,36
+82,Andersen1986,citalopram,57,23
+82,Andersen1986,clomipramine,57,31
+84,Timmerman1993 (Study 89422 - FDA and Haffmans 1996),fluvoxamine,109,31
+84,Timmerman1993 (Study 89422 - FDA and Haffmans 1996),citalopram,108,33
+85,Patris1996 (Study 91301 - FDA),fluoxetine,184,123
+85,Patris1996 (Study 91301 - FDA),citalopram,173,120
+86,Bougerol1997 (Study 91302 - FDA),fluoxetine,158,109
+86,Bougerol1997 (Study 91302 - FDA),citalopram,158,102
+93,Hsu2011,citalopram,25,9
+93,Hsu2011,sertraline,26,6
+114,Perahia2008a (HMBU) (NCT00071695),duloxetine,166,85
+114,Perahia2008a (HMBU) (NCT00071695),venlafaxine,166,91
+116,Perahia2008b (HMCQ) (NCT00067912),duloxetine,164,79
+116,Perahia2008b (HMCQ) (NCT00067912),venlafaxine,340,81
+118,Lee2007 (F1J-AA-HMCV) (NCT00489775),duloxetine,238,144
+118,Lee2007 (F1J-AA-HMCV) (NCT00489775),paroxetine,240,157
+126,Hao2014,duloxetine,140,86
+126,Hao2014,paroxetine,141,74
+130,SCT-MD-09,escitalopram,16,*
+130,SCT-MD-09,fluoxetine,14,*
+131,Kennedy2005 (SCT-MD-16),escitalopram,102,61
+131,Kennedy2005 (SCT-MD-16),fluoxetine,103,63
+133,Bielski2004 (SCT-MD-12),escitalopram,101,59
+133,Bielski2004 (SCT-MD-12),venlafaxine,101,47
+134,Montgomery2004a (Study 99067),escitalopram,148,113
+134,Montgomery2004a (Study 99067),venlafaxine,145,113
+136,Ventura2007 (SCT-MD-18),escitalopram,107,75
+136,Ventura2007 (SCT-MD-18),sertraline,108,74
+137,Lalit2004,escitalopram,69,62
+137,Lalit2004,citalopram,74,64
+137,Lalit2004,sertraline,71,69
+140,Colonna2005 (Study 99022),escitalopram,175,104
+140,Colonna2005 (Study 99022),citalopram,182,96
+141,Moore2005,escitalopram,142,105
+141,Moore2005,citalopram,152,87
+143,Baldwin2006b (Study 99505),paroxetine,159,111
+143,Baldwin2006b (Study 99505),escitalopram,166,112
+144,Wade2007 (Study 10990),escitalopram,144,94
+144,Wade2007 (Study 10990),duloxetine,151,81
+145,Khan2007 (SCT-MD-23) (NCT00108979),escitalopram,140,61
+145,Khan2007 (SCT-MD-23) (NCT00108979),duloxetine,138,52
+146,Boulenger2006 (Study 10351),escitalopram,232,144
+146,Boulenger2006 (Study 10351),paroxetine,227,128
+147,Li2006,escitalopram,28,22
+147,Li2006,citalopram,28,19.012
+148,Yevtushenko2007,escitalopram,109,103
+148,Yevtushenko2007,citalopram,110,90
+149,Mao2008,fluoxetine,117,89
+149,Mao2008,escitalopram,123,94
+150,Hu2009,escitalopram,25,21
+150,Hu2009,citalopram,23,18.998
+151,Jiang2009,escitalopram,32,30
+151,Jiang2009,citalopram,32,31
+152,Ou2010,citalopram,120,87
+152,Ou2010,escitalopram,120,83
+153,Li2010,escitalopram,24,19.9992
+153,Li2010,citalopram,24,18.9992
+157,Lv2013,escitalopram,20,16
+157,Lv2013,citalopram,22,17
+169,Chouinard1985,fluoxetine,25,8
+169,Chouinard1985,amitriptyline,28,15
+173,Young1987 Â ,fluoxetine,32,*
+173,Young1987 Â ,amitriptyline,32,*
+175,DeRonchi1998,fluoxetine,32,16
+175,DeRonchi1998,amitriptyline,33,18
+176,Debus1988,fluoxetine,22,9
+176,Debus1988,trazodone,21,9
+177,Upward1988,fluoxetine,13,*
+177,Upward1988,amitriptyline,14,*
+178,Laakman1988 Â ,fluoxetine,63,55
+178,Laakman1988 Â ,amitriptyline,65,57
+180,Falk1989,trazodone,13,4
+180,Falk1989,fluoxetine,14,8
+181,Fawcett1989,amitriptyline,20,7
+181,Fawcett1989,fluoxetine,20,8
+182,Manna1989,fluoxetine,15,12
+182,Manna1989,clomipramine,15,11
+183,Ginestet1989,fluoxetine,28,22
+183,Ginestet1989,clomipramine,26,18
+184,Ropert1989 Â ,fluoxetine,71,42
+184,Ropert1989 Â ,clomipramine,72,31
+185,Fudge1990,fluoxetine,21,10
+185,Fudge1990,trazodone,17,13
+186,Kerkhofs1990,fluoxetine,16,6
+186,Kerkhofs1990,amitriptyline,18,6
+187,Noguera1991,clomipramine,60,32
+187,Noguera1991,fluoxetine,60,37
+188,Keegan1991,fluoxetine,20,12
+188,Keegan1991,amitriptyline,22,16
+189,Preskorn1991,fluoxetine,30,12
+189,Preskorn1991,amitriptyline,31,8
+190,Beasley1991,trazodone,61,34
+190,Beasley1991,fluoxetine,65,33
+191,Judd1993,fluoxetine,30,15
+191,Judd1993,amitriptyline,28,12
+196,Demyttenaere1998 Â ,amitriptyline,31,18
+196,Demyttenaere1998 Â ,fluoxetine,35,22
+197,Marchesi1998 Â ,fluoxetine,67,45
+197,Marchesi1998 Â ,amitriptyline,75,59
+198,OntiverosSanchez1998 Â ,fluoxetine,21,7
+198,OntiverosSanchez1998 Â ,amitriptyline,21,6
+199,Versiani1999,fluoxetine,77,57
+199,Versiani1999,amitriptyline,80,58
+202,Fava2002,sertraline,96,70
+202,Fava2002,fluoxetine,92,57
+202,Fava2002,paroxetine,96,64
+210,DeWilde1983a,fluvoxamine,22,16
+210,DeWilde1983a,clomipramine,21,17
+221,Remick1994,amitriptyline,17,5
+221,Remick1994,fluvoxamine,16,9
+222,Nemeroff1995,fluvoxamine,49,27
+222,Nemeroff1995,sertraline,48,23
+223,Ottevanger1995,fluvoxamine,20,13
+223,Ottevanger1995,clomipramine,20,16
+224,Rapaport1996,fluvoxamine,51,30
+224,Rapaport1996,fluoxetine,49,29
+227,Kiev1997,fluvoxamine,30,17
+227,Kiev1997,paroxetine,30,16
+228,Murasaki1998,fluvoxamine,113,51
+228,Murasaki1998,amitriptyline,122,54
+229,Dalery2003,fluvoxamine,90,53
+229,Dalery2003,fluoxetine,94,54
+230,Rossini2005,fluvoxamine,40,29
+230,Rossini2005,sertraline,48,28
+232,Harris1991,fluvoxamine,35,13
+232,Harris1991,amitriptyline,34,21
+239,Ansseau1989a,milnacipran,95,30
+239,Ansseau1989a,amitriptyline,49,35
+240,Ansseau1989b,milnacipran,44,28
+240,Ansseau1989b,amitriptyline,43,22
+241,Ansseau1991,fluvoxamine,41,22
+241,Ansseau1991,milnacipran,85,25
+242,Ansseau1994b,milnacipran,97,32
+242,Ansseau1994b,fluoxetine,93,43
+243,Leinonen1997,milnacipran,52,32
+243,Leinonen1997,clomipramine,55,32
+244,Guelfi1998,milnacipran,200,52
+244,Guelfi1998,fluoxetine,100,51
+245,Clerc2001,fluvoxamine,56,32
+245,Clerc2001,milnacipran,57,40
+246,Yang2003,milnacipran,27,4
+246,Yang2003,sertraline,26,2
+247,Sechter2004,milnacipran,149,86
+247,Sechter2004,paroxetine,153,91
+248,Kamijima2013 (japicCTI-090733),milnacipran,604,171
+248,Kamijima2013 (japicCTI-090733),paroxetine,301,171
+258,vanMoffaert1995b,mirtazapine,100,61
+258,vanMoffaert1995b,trazodone,100,51
+262,Wheatley1998,mirtazapine,66,39
+262,Wheatley1998,fluoxetine,67,28
+263,Leinonen1999 (Agren1995),mirtazapine,137,116
+263,Leinonen1999 (Agren1995),citalopram,133,117
+264,Benkert2000 (E-1559),mirtazapine,139,74
+264,Benkert2000 (E-1559),paroxetine,136,66
+265,Schatzberg2002 (003-901),mirtazapine,128,72
+265,Schatzberg2002 (003-901),paroxetine,126,60
+266,Hong2003 (22521),mirtazapine,66,35
+266,Hong2003 (22521),fluoxetine,66,30
+267,"Behnke2003 (E-1690, Kjernisted2002)",mirtazapine,176,117
+267,"Behnke2003 (E-1690, Kjernisted2002)",sertraline,170,114
+268,Wade2003 (E-1721),mirtazapine,99,35
+268,Wade2003 (E-1721),paroxetine,98,40
+269,Winokur2003,mirtazapine,8,8
+269,Winokur2003,fluoxetine,12,6
+270,Amini2005,mirtazapine,18,12
+270,Amini2005,fluoxetine,18,8
+271,Versiani2005,mirtazapine,145,106
+271,Versiani2005,fluoxetine,149,104
+272,Szegedi2006,mirtazapine,130,72
+272,Szegedi2006,venlafaxine,128,62
+277,"Murasaki2010a (iQWIG22532, Schoemaker2002)",mirtazapine,104,61
+277,"Murasaki2010a (iQWIG22532, Schoemaker2002)",fluvoxamine,105,70
+278,"Murasaki2010b (iQWIG9902, Schoemaker2002)",mirtazapine,101,71
+278,"Murasaki2010b (iQWIG9902, Schoemaker2002)",fluvoxamine,102,57
+279,Benkert2006(C-1763),mirtazapine,140,70
+279,Benkert2006(C-1763),venlafaxine,135,56
+280,E-1569,mirtazapine,73,40
+280,E-1569,paroxetine,75,48
+281,"Debonnel2000 (Blier2009, iQWIG E-1639)",mirtazapine,21,4
+281,"Debonnel2000 (Blier2009, iQWIG E-1639)",paroxetine,21,9
+282,Goodarzi 2015(IRCT2012101811155N1),mirtazapine,24,*
+282,Goodarzi 2015(IRCT2012101811155N1),citalopram,28,*
+284,Armitage1997,nefazodone,22,11
+284,Armitage1997,fluoxetine,21,11
+285,Baldwin1996,nefazodone,105,58
+285,Baldwin1996,paroxetine,101,58
+286,Berlanga1997,nefazodone,37,17
+286,Berlanga1997,fluoxetine,37,18
+287,Bueno1997,nefazodone,19,*
+287,Bueno1997,amitriptyline,18,*
+289,Feiger1996,nefazodone,78,42
+289,Feiger1996,sertraline,82,41
+292,Gillin1997,nefazodone,24,12
+292,Gillin1997,fluoxetine,20,8
+293,Hicks2002,nefazodone,20,11
+293,Hicks2002,paroxetine,20,16
+304,PAR 29060.308 (HP/81/74A),paroxetine,10,*
+304,PAR 29060.308 (HP/81/74A),amitriptyline,12,*
+305,PAR 29060.318 (HP/82/64A),paroxetine,9,4
+305,PAR 29060.318 (HP/82/64A),amitriptyline,12,3
+306,Battegay1985 (PAR 29060.309 HP/81/162A),paroxetine,11,*
+306,Battegay1985 (PAR 29060.309 HP/81/162A),amitriptyline,10,*
+307,PAR 29060.310 (HP 81/85A),paroxetine,10,2
+307,PAR 29060.310 (HP 81/85A),amitriptyline,13,5
+308,PAR 29060.316 (HP/82/47A),paroxetine,9,*
+308,PAR 29060.316 (HP/82/47A),amitriptyline,8,*
+310,PAR 29060.314 (HP 82/134),paroxetine,10,*
+310,PAR 29060.314 (HP 82/134),amitriptyline,8,*
+311,PAR 29060/281 ,paroxetine,82,30
+311,PAR 29060/281 ,amitriptyline,80,43
+312,PAR MDUK 032,paroxetine,29,15
+312,PAR MDUK 032,amitriptyline,30,14
+324,Kuhs1989 (MDUK_29060_III_85_043),paroxetine,12,7
+324,Kuhs1989 (MDUK_29060_III_85_043),amitriptyline,12,4
+326,Guillibert1989 (PAR 290 MDF 29060 1727 M),clomipramine,39,28
+326,Guillibert1989 (PAR 290 MDF 29060 1727 M),paroxetine,40,26
+327,Pelicier1993 (PAR MDED/29060/III/86/1728M291),clomipramine,42,25
+327,Pelicier1993 (PAR MDED/29060/III/86/1728M291),paroxetine,41,29
+329,MDF/29060/III/070/88/MC,paroxetine,32,22
+329,MDF/29060/III/070/88/MC,clomipramine,30,12
+330,"Rouillon1991 (Limosin2006, 029060/1/CPMS 069 1991)",paroxetine,45,27
+330,"Rouillon1991 (Limosin2006, 029060/1/CPMS 069 1991)",clomipramine,47,23
+331,Geretsegger1995 (MY-060/BRL-029060/1),paroxetine,44,21
+331,Geretsegger1995 (MY-060/BRL-029060/1),amitriptyline,47,24
+332,DUAG1990,paroxetine,62,23
+332,DUAG1990,clomipramine,58,31
+335,Tignol1993 (29060/087),paroxetine,89,53
+335,Tignol1993 (29060/087),fluoxetine,87,54
+336,Schoene1993 (Geretsegger1994 MY1021/BRC),paroxetine,54,19
+336,Schoene1993 (Geretsegger1994 MY1021/BRC),fluoxetine,52,8
+337,Ontiveros1994 (MY-0144/BRL 29060/1/CPMS-135 (PAR135)),paroxetine,60,41
+337,Ontiveros1994 (MY-0144/BRL 29060/1/CPMS-135 (PAR135)),fluoxetine,62,35
+338,Bignamini1992 (PAR 29060/078),paroxetine,156,82
+338,Bignamini1992 (PAR 29060/078),amitriptyline,153,91
+339,Hutchinson1992,amitriptyline,32,15
+339,Hutchinson1992,paroxetine,58,34
+340,Staner1995 (063),paroxetine,21,7
+340,Staner1995 (063),amitriptyline,19,9
+342,Ansseau1994a (MY-1005/BRL-029060/1/CPMS-112),paroxetine,55,24
+342,Ansseau1994a (MY-1005/BRL-029060/1/CPMS-112),fluvoxamine,65,24
+343,DeWilde1993,paroxetine,49,25
+343,DeWilde1993,fluoxetine,50,26
+344,Gagiano1993,paroxetine,45,30
+344,Gagiano1993,fluoxetine,45,27
+347,29060/356,paroxetine,68,33
+347,29060/356,fluoxetine,70,32
+348,SER-CHN-1,paroxetine,113,94
+348,SER-CHN-1,amitriptyline,118,80
+350,"Moller1993 (Stuppaeck1994, MY-059.073/29060/1)",paroxetine,78,43
+350,"Moller1993 (Stuppaeck1994, MY-059.073/29060/1)",amitriptyline,75,46
+351,Christiansen1996,paroxetine,71,46
+351,Christiansen1996,amitriptyline,73,48
+355,Bakish1997,fluoxetine,9,*
+355,Bakish1997,paroxetine,12,*
+356,Ravindran1997 (MY-1055/BRL-029060/1/CPMS-245 PAR 245),paroxetine,513,328
+356,Ravindran1997 (MY-1055/BRL-029060/1/CPMS-245 PAR 245),clomipramine,506,317
+359,Chouinard1999 (29060/131),paroxetine,102,67
+359,Chouinard1999 (29060/131),fluoxetine,101,67
+360,Tsutsui2000,paroxetine,116,65
+360,Tsutsui2000,trazodone,109,45
+361,Miura2000,paroxetine,109,42
+361,Miura2000,amitriptyline,119,54
+364,Cassano2002 (29060/421),paroxetine,123,50
+364,Cassano2002 (29060/421),fluoxetine,119,35
+374,Deushle 2003(NCT01049347),amitriptyline,14,*
+374,Deushle 2003(NCT01049347),paroxetine,21,*
+379,Grunebaum2012 (NCT00429169),paroxetine,38,*
+379,Grunebaum2012 (NCT00429169),bupropion,40,*
+384,Bosc1997b (Study 016 - Massana 1999),reboxetine,79,59
+384,Bosc1997b (Study 016 - Massana 1999),fluoxetine,89,64
+390,Baldwin2006a (97-CRBX-052 - Study 052),reboxetine,159,80
+390,Baldwin2006a (97-CRBX-052 - Study 052),paroxetine,166,100
+393,Study 043,reboxetine,183,77
+393,Study 043,citalopram,176,98
+394,Schwartz2002 (iQWIG),reboxetine,80,45
+394,Schwartz2002 (iQWIG),venlafaxine,87,48
+396,Studie032 (M2020/0032),reboxetine,43,21
+396,Studie032 (M2020/0032),fluoxetine,42,23
+398,Cohn1990,sertraline,161,84
+398,Cohn1990,amitriptyline,80,40
+399,Aguglia1993,sertraline,52,35
+399,Aguglia1993,fluoxetine,56,26
+400,Bersani1994,sertraline,34,18
+400,Bersani1994,amitriptyline,34,17
+401,Moon1994,sertraline,51,28
+401,Moon1994,clomipramine,55,29
+403,Bennie1995,sertraline,142,73
+403,Bennie1995,fluoxetine,144,63
+404,vanMoffaert1995a,sertraline,83,49
+404,vanMoffaert1995a,fluoxetine,82,48
+406,Ekselius1997,citalopram,200,136
+406,Ekselius1997,sertraline,200,139
+408,Moller1998 (Hegerl1997),amitriptyline,79,40
+408,Moller1998 (Hegerl1997),sertraline,81,32
+409,Sechter1999,sertraline,118,48
+409,Sechter1999,fluoxetine,120,35
+410,Newhouse2000,sertraline,117,85
+410,Newhouse2000,fluoxetine,119,84
+411,Aberg-Wisted2000,paroxetine,177,112
+411,Aberg-Wisted2000,sertraline,176,111
+412,Moller2000,sertraline,116,51
+412,Moller2000,amitriptyline,124,71
+413,Lepine2000,sertraline,82,53
+413,Lepine2000,clomipramine,84,54
+414,Sir2005,venlafaxine,84,56
+414,Sir2005,sertraline,79,56
+415,Shelton2006 (NCT00179283),venlafaxine,78,49
+415,Shelton2006 (NCT00179283),sertraline,82,45
+430,Lapierre1980,amitriptyline,20,*
+430,Lapierre1980,trazodone,20,*
+437,Blacker1988,amitriptyline,44,29
+437,Blacker1988,trazodone,112,58
+438,Altamura1989b,amitriptyline,37,21
+438,Altamura1989b,trazodone,36,21
+439,Kasper2005b,paroxetine,53,48
+439,Kasper2005b,trazodone,55,48
+440,Munizza2006,sertraline,60,37
+440,Munizza2006,trazodone,62,46
+447,0600A-654,venlafaxine,131,*
+447,0600A-654,fluoxetine,135,*
+458,Clerc1994,fluoxetine,34,17
+458,Clerc1994,venlafaxine,34,24
+461,Dierick1996,fluoxetine,161,95
+461,Dierick1996,venlafaxine,153,107
+465,Tylee1997,fluoxetine,170,58
+465,Tylee1997,venlafaxine,171,67
+466,Hackett1998,fluvoxamine,34,14
+466,Hackett1998,venlafaxine,77,48
+467,Costaesilva1998,fluoxetine,186,153
+467,Costaesilva1998,venlafaxine,196,170
+468,McPartlin1998,paroxetine,178,117
+468,McPartlin1998,venlafaxine,183,130
+469,Samuelian1998,venlafaxine,52,30
+469,Samuelian1998,clomipramine,50,20
+471,Smeraldi1998,venlafaxine,55,41
+471,Smeraldi1998,clomipramine,58,40
+471,Smeraldi1998,trazodone,57,33
+473,Alves1999,fluoxetine,47,40
+473,Alves1999,venlafaxine,40,34
+476,Mehtonen2000,sertraline,72,41
+476,Mehtonen2000,venlafaxine,75,49
+477,Tzanakaki2000,fluoxetine,54,33
+477,Tzanakaki2000,venlafaxine,55,38
+478,Gentil2000,venlafaxine,57,43
+478,Gentil2000,amitriptyline,59,44
+479,Casabona2002 (0600B 428),paroxetine,56,29
+479,Casabona2002 (0600B 428),venlafaxine,58,43
+480,Sauer2003,venlafaxine,79,30
+480,Sauer2003,amitriptyline,77,35
+481,Allard2004,citalopram,75,50
+481,Allard2004,venlafaxine,76,49
+484,Keller2007 (NCT00046020),fluoxetine,275,210
+484,Keller2007 (NCT00046020),venlafaxine,821,612
+489,Hosseini2015 (IRCT201203048513N1.),venlafaxine,28,12
+489,Hosseini2015 (IRCT201203048513N1.),citalopram,25,21
+492,Heller2009(NCT00909155),venlafaxine,15,9
+492,Heller2009(NCT00909155),fluoxetine,14,8
+493,Chang 2015,fluoxetine,58,41
+493,Chang 2015,venlafaxine,54,38
+517,"Wang2015 (NCT01571453, KCT0000432, 13926A)",vortioxetine,213,139
+517,"Wang2015 (NCT01571453, KCT0000432, 13926A)",venlafaxine,230,132
