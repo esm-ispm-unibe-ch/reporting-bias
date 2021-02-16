@@ -8,12 +8,5 @@ function table1select(id){
 	console.log("value",x);
 	var out = {id:id, value:x};
 
-	Shiny.setInputValue("table1select", out, {priority: "event"});
-
+	Shiny.setInputValue("table1select", out);
 }
-
-function table1setKnownsUndetected(){
-console.log("set knowns undetected");
-	Shiny.setInputValue("setKnownsUndetected");
-}
-

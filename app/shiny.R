@@ -38,44 +38,34 @@ iscompared = function(treat1, treat2, directs) {
 ##
 
 server <- function(input, output, session) {
-  state <- reactiveValues(allData = NULL, table1 = tibble(), error="")
-  myData <- reactiveValues()
+  state <- reactiveValues(allData = {}, table1 = tibble(), error="")
+  
+  myData <- reactive({state$allData$directs})
   
   observeEvent(input$file1,{
     state$allData <- allMyData(input$file1)
-    myData <- state$allData$directs
   },ignoreInit=T)
   
   observe({
      res <- unique(state$allData$directs$t) %>% sort()
-     print(c("treatments",res))
      state$treatments <- res
-  })
-  
-  observeEvent(input$inputMod,{
-    state$modelFixed = input$inputMod=="fixed"
-    state$modelRandom = input$inputMod=="random"
-  })
-   
-  observe({
-    state$nma <- nma(state$allData$directs, input$inputSM, state$modelFixed, state$modelRandom)
     state$bdata <- bdata(state$allData$directs)
   })
   
-  observe({
-    state$bnma <- bnma(input$inputSM, state$bdata, input$inputRef, input$inputMod)
-  })
+  observeEvent(input$inputMod,{
+    state$modelFixed <- input$inputMod=="fixed"
+    state$modelRandom <- input$inputMod=="random"
+  },ignoreInit=T)
   
-  observeEvent(state$treatments,{
-    tryCatch({
+  observeEvent(input$inputSM,{
+    state$nma <- nma(state$allData$directs, input$inputSM, state$modelFixed, state$modelRandom)
+    state$bnma <- bnma(input$inputSM, state$bdata, input$inputRef, input$inputMod)
+  },ignoreInit=T)
+   
+  observe({
+    if(!is.null(state$treatments)){
       state$table1 <- buildTable1(state$treatments, state$allData$directs, state$allData$otherOutcomes)
-    },error=function(x){
-      print("table1WebError")
-      state$error<-paste(x)
-      print(paste(x))
-      state$table1 <- NULL
-    })
-    
+    }
   })
   
     output$table2 <- DT::renderDataTable({
@@ -163,12 +153,35 @@ Unobserved"
       return(out)
     }
     
-   tryCatch({
+  table1Web <- tibble()
+  
+  table1Header = htmltools::withTags(table(
+    class = 'display',
+    thead(
+      tr(
+        th(rowspan = 2, '-'),
+        th(rowspan = 2, 'Comparisons'),
+        th(rowspan = 2, 'group'),
+        th(colspan = 2, 'Number of studies in each comparison'),
+        th(colspan = 1, 'known unknowns',
+                         ),
+        th(colspan = 1, 'unknowns unknowns'),
+        th(colspan = 1, 'overall bias'),
+      ),tr(
+        th(colspan = 1, 'Reporting this outcome (sample size)'),
+        th(colspan = 1, 'Total identified in the SR (total sample size)'),
+        th(colspan = 1, 'Classification system (e.g. ORBIT)'),
+        th(colspan = 1, 'Qualitative signals and quantitative considerations'
+          ),
+        th(colspan = 1, 'Algorithm for merging of previous assessments')
+      )
+    )
+  ))
     table1Web <- state$table1 %>%
-      mutate(groupLabel = labelGroup(compgroup)) %>%
-      mutate(known_unknownsWeb = table1DropDown("known_unknowns",treat1,treat2,comparison,groupLabel,known_unknowns,proposed)) %>%
-      mutate(unknown_unknownsWeb = table1DropDown("unknown_unknowns",treat1,treat2,comparison,groupLabel, unknown_unknowns,proposed)) %>%
-      mutate(overall_biasWeb = table1DropDown("overall_bias",treat1,treat2,comparison,groupLabel, overall_bias,proposed)) %>%
+      mutate(groupLabel = mapply(labelGroup,compgroup)) %>%
+      mutate(known_unknownsWeb = mapply(table1DropDown,"known_unknowns",treat1,treat2,comparison,groupLabel,known_unknowns,proposed)) %>%
+      mutate(unknown_unknownsWeb = mapply(table1DropDown,"unknown_unknowns",treat1,treat2,comparison,groupLabel, unknown_unknowns,proposed)) %>%
+      mutate(overall_biasWeb = mapply(table1DropDown,"overall_bias",treat1,treat2,comparison,groupLabel, overall_bias,proposed)) %>%
       mutate(column1= paste(numstudies," (",samplesize,")",sep="")) %>%
       mutate(column2= paste(total.numstudies," (",total.samplesize,")",sep="")) %>%
       select(comparison
@@ -180,53 +193,18 @@ Unobserved"
              ,overall_biasWeb
              )
    
-    table1Header = htmltools::withTags(table(
-      class = 'display',
-      thead(
-        tr(
-          th(rowspan = 2, '-'),
-          th(rowspan = 2, 'Comparisons'),
-          th(rowspan = 2, 'group'),
-          th(colspan = 2, 'Number of studies in each comparison'),
-          th(colspan = 1, 'known unknowns',
-                           ),
-          th(colspan = 1, 'unknowns unknowns'),
-          th(colspan = 1, 'overall bias'),
-        ),tr(
-          th(colspan = 1, 'Reporting this outcome (sample size)'),
-          th(colspan = 1, 'Total identified in the SR (total sample size)'),
-          th(colspan = 1, 'Classification system (e.g. ORBIT)'),
-          th(colspan = 1, 'Qualitative signals and quantitative considerations'
-            ),
-          th(colspan = 1, 'Algorithm for merging of previous assessments')
-        )
-      )
-    ))
-   
     datatable(table1Web,
                   container = table1Header,
                   escape = F,
-                  extensions = c('RowGroup', 'Buttons'),
+                  extensions = c('RowGroup'),
                   options = list(rowGroup = list(dataSrc = 2)
                                  , paging = F
                                  , columnDefs = list(list(visible=FALSE, targets=c(2)))
                                  , dom = 'Bfrtip'
-                                 , buttons = c('copy', 'csv', 'excel')
                   ),
-                  # callback = "setKnownUndetected = function(){
-                  #               Shiny.setInputValue('setKnownsUndetected')}
-                  #            ;",
                   selection = 'none'
                   )
 
-    },warning=function(x){
-      return(table1Web)
-    },error=function(x){
-      print("table1WebError")
-      state$error<-paste(x)
-      table1Web <- tibble()
-      return({})
-    }) 
   }, server=F
   )
    
@@ -260,10 +238,10 @@ Unobserved"
   nma <- function(data, sm, modelFixed, modelRandom){
     getNMA <- function() {
       if(sm == "OR" | sm == "RR"){
-      pw <- pairwise(treat=t, event=r, n=n, data = myData, studlab = id)
+      pw <- pairwise(treat=t, event=r, n=n, data = myData(), studlab = id)
     }
     else {
-      pw <- pairwise(treat=t, n=n, mean=mean, sd=sd, data = myData, studlab = id)
+      pw <- pairwise(treat=t, n=n, mean=mean, sd=sd, data = myData(), studlab = id)
     }
     return(netmeta(TE, seTE, treat1, treat2, studlab, data = pw, sm=sm, n1=n1, n2=n2,  
             comb.fixed = modelFixed, comb.random = modelRandom)  
@@ -307,20 +285,28 @@ Unobserved"
   }
   
   output$contents <- DT::renderDataTable({
-    DT::datatable(myData)       
+    DT::datatable(myData())       
   })
   
   output$ref <- renderUI({
     radioButtons(inputId = "inputRef", 
                  label = "Choose the reference treatment",
-                 choices = unique(state$nma$trts))
+                 choices = state$treatments)
   }) 
   
   output$summary <- renderPrint({
     summary(state$nma)
   })
+  
+  getNMA <- reactive({
+    validate(
+      need(state$nma != "", "netmeta not ready")
+    )
+    state$nma
+  })
+  
   output$netgraph <- renderPlot({
-    netgraph(state$nma, cex = 0.7, col = "black", plastic=FALSE, 
+    netgraph(getNMA(), cex = 0.7, col = "black", plastic=FALSE, 
              points=T, col.points = "darkgreen", cex.points =10*sqrt(n.trts/max(n.trts)),  
              thickness="number.of.studies", lwd.max = 12, lwd.min = 1, multiarm=F)
   })
@@ -371,7 +357,7 @@ Unobserved"
   })
   
   NMRdata <- reactive({
-    newdata <- pooledVar(state$nma, myData)
+    newdata <- pooledVar(state$nma, myData())
     data.prep(arm.data = newdata,
               varname.t = "t",
               varname.s = "id")
@@ -458,11 +444,16 @@ Unobserved"
   output$fpref <- renderPlot(reffp())
   output$reftest <- renderPrint(reffp())
     
-  
-  contribution <- reactive({
-    getContributionMatrix(myData, type = ifelse(input$inputSM=="OR" | input$inputSM=="RR","long_binary", "long_continuous"), model = input$inputMod, sm=input$inputSM)
+  contr <- reactive({getContributionMatrix(myData()
+                                 , type = ifelse(input$inputSM=="OR" 
+                                                 | input$inputSM=="RR"
+                                                 ,"long_binary"
+                                                 , "long_continuous")
+                                 , model = input$inputMod
+                                 , sm=input$inputSM)
   })
-  output$contr <- renderTable(round(contribution()$contributionMatrix, digits = 2), rownames = T)
+  
+  output$contr <- renderTable(round(contr()$contributionMatrix, digits = 2), rownames = T)
   
   output$mydownload2 <- downloadHandler(                         
     filename = function() {paste("", ".xlsx")},       # name for the downloaded file with extension
@@ -502,14 +493,15 @@ Unobserved"
       sel <-  unlist(strsplit(t1sel$id,"-vs-",fixed=T))
       icolumn <- sel[[1]]
       icomparison <- sel[[2]]
+      print(t1sel$value)
       chr = filter(state$table1, icomparison == comparison) %>%
             mutate("{icolumn}" := as.integer(t1sel$value)) %>%
             mutate(proposed = 
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
-      state$table1 = rows_update(state$table1, chr)
-  
-  }, ignoreNULL=T, ignoreInit=T)
+      state$table1 <- rows_update(state$table1, chr)
+      print(c("state1",chr))
+  })
   
   observeEvent(input$applyProposedTable1, {
     print("Applying proposed to overall")
@@ -563,10 +555,10 @@ Unobserved"
     }
   })
   
- output$messages <- renderDataTable({datatable(state$table1)})
+ output$messages <- renderText({state$error})
  
   output$dataAnalysis <- renderUI({
-    if(!is.null(myData)){
+    if(!is.null(myData())){
              sidebarLayout(
                sidebarPanel(
                  uiOutput("smOptions"),

@@ -3,14 +3,14 @@ buildTable1 = function(treatments,directslong,otherOutcomeslong){
 
     combinations <- t(combn(treatments,2))
     colnames(combinations) <- c("treat1","treat2")
-    allcomparisons <- as.tibble(combinations) %>% 
+    allcomparisons <- as_tibble(combinations) %>% 
       mutate(comparison =
           mapply(function(x,y){comp = sort(c(x,y)); return(paste(comp[1],comp[2],sep=":"))}, treat1, treat2)
       ) %>%
       select(comparison,treat1,treat2)
 
     getTable1Rows <- function(longdata){
-      pw <- as.tibble(pairwise(treat=t, event=r, n=n, data = longdata , studlab = id)) %>% 
+      pw <- as_tibble(pairwise(treat=t, event=r, n=n, data = longdata , studlab = id)) %>% 
         mutate(comparison =
             mapply(function(x,y){comp = sort(c(x,y)); return(paste(comp[1],comp[2],sep=":"))}, treat1, treat2)
               )
