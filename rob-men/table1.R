@@ -38,6 +38,5 @@ buildTable1 = function(treatments,directslong,otherOutcomeslong){
       mutate(proposed = 0) %>%
       mutate(overall_bias = 0)
     column_to_rownames(restable1, var = "comparison")
-    print(restable1)
     return(restable1)
 }
