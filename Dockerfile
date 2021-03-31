@@ -1,27 +1,17 @@
 # Base image https://hub.docker.com/u/rocker/
-FROM rocker/shiny:latest
-
-# system libraries of general use
-## install debian packages
-RUN apt-get update -qq && apt-get -y --no-install-recommends install \
-  libxml2-dev \
-  libcairo2-dev \
-  libsqlite3-dev \
-  libmariadbd-dev \
-  libpq-dev \
-  libssh2-1-dev \
-  unixodbc-dev \
-  libcurl4-openssl-dev \
-  libssl-dev
+FROM tosku/rob-men:1.1
 
 ## update system libraries
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get clean
 
+RUN apt install openjdk-14-jdk -y
+RUN R CMD javareconf
+
 # copy necessary files
 ## app folder
-#COPY rob-men app
+#COPY rob-men /srv/shiny-server/
 ## renv.lock file
 #COPY rob-men/renv.lock renv.lock
 
@@ -30,6 +20,8 @@ RUN apt-get update && \
 #RUN Rscript -e 'renv::consent(provided = TRUE)'
 #RUN Rscript -e 'renv::restore()'
 
+
+
 EXPOSE 3838
 
-CMD ["/usr/bin/shiny-server.sh"]
+CMD ["/usr/bin/shiny-server"]
