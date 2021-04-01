@@ -1,5 +1,5 @@
 # Base image https://hub.docker.com/u/rocker/
-FROM tosku/rob-men:1.2
+FROM tosku/rob-men:1.4
 
 ## update system libraries
 RUN apt-get update && \
@@ -22,6 +22,6 @@ COPY rob-men /srv/shiny-server
 
 
 
-EXPOSE 3838
+EXPOSE 2828
 
 CMD ["/usr/bin/shiny-server"]
