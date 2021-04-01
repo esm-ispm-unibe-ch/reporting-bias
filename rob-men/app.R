@@ -74,7 +74,7 @@ server <- function(input, output, session) {
   observeEvent(state$nmaDone, {
    validate(need(state$nmaDone == T, "netmeta not ready")
            )
-      state$table1 <- buildTable1(state$treatments, state$allData$directs, state$allData$otherOutcomes)
+      state$table1 <- buildTable1(state$treatments, state$allData$directs, state$allData$otherOutcomes, state$allData$isBinary)
   })
   
   observe({
@@ -521,18 +521,42 @@ Unobserved"
   
   allMyData <- function(inFile){
     getData <- function(){
-      dataraw <- read.csv(inFile$datapath, header = TRUE)
-      # dataraw <- read.csv("../siontis.csv", header = TRUE)
-      alldata <- as.data.frame(dataraw)
+      tryCatch({datarawcomma <- read.csv(inFile$datapath, header = TRUE, sep=',', dec='.')},
+               error = function(e){datarawcomma<-matrix()})
+      tryCatch({datarawsemicolon1 <- read.csv(inFile$datapath, header = TRUE, sep=';', dec='.')},
+               error = function(e){datarawsemicolon1<-matrix()})
+      tryCatch({datarawsemicolon2 <- read.csv(inFile$datapath, header = TRUE, sep=';', dec=',')},
+               error = function(e){datarawsemicolon2<-matrix()})
+      nc <- tibble( name=c("datarawcomma","datarawsemicolon1","datarawsemicolon2")
+                  , ncol=c(dim(datarawcomma)[2],dim(datarawsemicolon1)[2], dim(datarawsemicolon2)[2])
+      )
+      datarawname <- nc %>% arrange(desc(ncol)) %>% slice(1) %>% select("name")
+      alldata <- as.data.frame(get(as.character(datarawname)))
       binaryColumns = c("id","study","t","n","r")
+      continuousColumns = c("id","study","t","n","mean","sd")
       isBinary = all(lapply(binaryColumns, function(x){x %in% colnames(alldata)}))
-      alldata <- alldata %>%
-        mutate(n = as.integer(n) ) %>%
-         mutate(r = as.integer(r) )
-      directs <- alldata %>%
-        filter(!is.na(r))
-      otherOutcomes <- alldata %>%
-        filter(is.na(r))
+      isContinuous = all(lapply(continuousColumns, function(x){x %in% colnames(alldata)}))
+      if(isBinary==T){
+        alldata <- alldata %>%
+          mutate(n = as.integer(n) ) %>%
+           mutate(r = as.integer(r) )
+        directs <- alldata %>%
+          filter(!is.na(r))
+        otherOutcomes <- alldata %>%
+          filter(is.na(r))
+      }else{ # continuous
+        if(isContinuous==F){
+          stop("missing columns or missmatching column names. Please refresh page")
+        }
+        alldata <- alldata %>%
+          mutate(n = as.integer(n) ) %>%
+           mutate(mean = as.numeric(mean) ) %>%
+           mutate(sd = as.numeric(sd) )
+        directs <- alldata %>%
+          filter(!is.na(mean))
+        otherOutcomes <- alldata %>%
+          filter(is.na(mean))
+      }
       return(list( isBinary=isBinary
                  , directs=directs
                  , otherOutcomes=otherOutcomes

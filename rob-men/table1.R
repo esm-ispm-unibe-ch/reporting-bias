@@ -1,4 +1,4 @@
-buildTable1 = function(treatments,directslong,otherOutcomeslong){
+buildTable1 = function(treatments,directslong,otherOutcomeslong,isBinary){
     alldata <- rbind(directslong, otherOutcomeslong)
 
     combinations <- t(combn(treatments,2))
@@ -10,7 +10,12 @@ buildTable1 = function(treatments,directslong,otherOutcomeslong){
       select(comparison,treat1,treat2)
 
     getTable1Rows <- function(longdata){
-      pw <- as_tibble(pairwise(treat=t, event=r, n=n, data = longdata , studlab = id)) %>% 
+      if(isBinary==T){
+        pw <- as_tibble(pairwise(treat=t, event=r, n=n, data = longdata , studlab = id))
+      }else{
+        pw <- as_tibble(pairwise(treat=t, mean=mean, sd=sd, n=n, data = longdata , studlab = id))
+      }
+      pw <- pw %>% 
         mutate(comparison =
             mapply(function(x,y){comp = sort(c(x,y)); return(paste(comp[1],comp[2],sep=":"))}, treat1, treat2)
               )
