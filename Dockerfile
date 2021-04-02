@@ -1,5 +1,5 @@
 # Base image https://hub.docker.com/u/rocker/
-FROM tosku/rob-men:1.4
+FROM tosku/rob-men:1.3
 
 ## update system libraries
 RUN apt-get update && \
@@ -12,6 +12,7 @@ RUN apt-get update && \
 # copy necessary files
 ## app folder
 COPY rob-men /srv/shiny-server
+COPY shiny-server.conf /etc/shiny-server/
 ## renv.lock file
 #COPY rob-men/renv.lock renv.lock
 
