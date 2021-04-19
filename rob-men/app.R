@@ -39,6 +39,8 @@ server <- function(input, output, session) {
                          , bnmrDone=F
                          , contr=NULL
                          , table2 = tibble()
+                         , numIter = 10000
+                         , burnin = 2000
                          )
   
   myData <- reactive({state$allData$directs})
@@ -78,7 +80,7 @@ server <- function(input, output, session) {
   })
   
   observe({
-    validate(need(state$analysisStarted == T, "analysis not started"),
+    validate(need(state$analysisStarted == T, "Analysis in progress..."),
              need(nrow(state$table1) > "0", "table1 not ready"),
              need(state$contr != "", "contribution matrix not ready"))
     isolate({
@@ -99,10 +101,10 @@ server <- function(input, output, session) {
     
     table2col4 = function(comparison, treat1, treat2, level){
       choices = c( ""
-                 , "No substantial contribution from comparisons with suspected bias"
-                 , paste("Substantial contribution from comparisons favouring ",treat1,sep="")
-                 , paste("Substantial contribution from comparisons favouring ",treat2,sep="")
-                 , "Substantial but more or less equal contribution"
+                 , "No substantial contribution from bias"
+                 , paste("Substantial contribution from bias favouring ",treat1,sep="")
+                 , paste("Substantial contribution from bias favouring ",treat2,sep="")
+                 , "Substantial contribution from bias balanced"
                  # , "Substantial but more or less equal contribution from comparisons favouring the opposite treatments"
       )
       
@@ -134,9 +136,9 @@ server <- function(input, output, session) {
     
     table2col8 = function(comparison, treat1, treat2, level){
       choices = c( ""
-                 ,"No evidence of small study effects"
-                 , paste("Small study effects favouring ",treat1,sep="")
-                 , paste("Small study effects favouring ",treat2,sep="")
+                 ,"No evidence of small-study effects"
+                 , paste("Small-study effects favouring ",treat1,sep="")
+                 , paste("Small-study effects favouring ",treat2,sep="")
       )
       
       chs <- tibble::rowid_to_column(as.data.frame(choices), "n")
@@ -174,7 +176,7 @@ server <- function(input, output, session) {
       if(mixed == "indirect"){
         res <- choices[table1_overall_bias+1]
       }else{
-        res <- paste("<span style='color:grey'>", choices[table1_overall_bias+1],"</span>",sep="")
+        res <- paste("<span style='color:lightgrey'>", choices[table1_overall_bias+1],"</span>",sep="")
       }
       return(res)
     }
@@ -224,9 +226,9 @@ server <- function(input, output, session) {
     }
     table2web <- state$table2 %>%
       mutate(table1_overall_bias_web = mapply(overallWeb,comparison,treat1,treat2,table1_overall_bias,mixed)) %>%
-      mutate(contrTreat1Web = mapply(function(x){round(x, digits=2)},contrTreat1)) %>%
-      mutate(contrTreat2Web = mapply(function(x){round(x, digits=2)},contrTreat2)) %>%
-      mutate(contrTreat3Web = mapply(function(x){round(x, digits=2)},contrTreat3)) %>%
+      mutate(contrTreat1Web = mapply(function(x){round(x, digits=0)},contrTreat1)) %>%
+      mutate(contrTreat2Web = mapply(function(x){round(x, digits=0)},contrTreat2)) %>%
+      mutate(contrTreat3Web = mapply(function(x){round(x, digits=0)},contrTreat3)) %>%
       mutate(contrEvaluationWeb = mapply(table2col4,comparison,treat1, treat2, contrEvaluation)) %>%
       mutate(effectsEvaluationWeb = mapply(table2col8,comparison,treat1, treat2, effectsEvaluation)) %>%
       mutate(finalWeb = mapply(table2Final,comparison,treat1, treat2, proposedFinal, final)) %>%
@@ -247,17 +249,20 @@ server <- function(input, output, session) {
     class = 'display',
     thead(
       tr(
-        th(colspan = 1, '-'),
-        th(colspan = 2, 'NMA estimate'),
-        th(colspan = 1, '% contribution from comparisons with suspected bias favouring first treatment'),
-        th(colspan = 1, '% contribution from comparisons with suspected bias favouring second treatment'),
-        th(colspan = 1, 'Total % contributions from comparisons with suspected bias'),
-        th(colspan = 1, 'Evaluation of contribution of comparisons with suspected bias'),
-        th(colspan = 1, 'Bias assessment for direct comparisons (observed and unobserved) from Table 1'),
-        th(colspan = 1, "NMA summary effect"),
-        th(colspan = 1, 'NMR adjusted summary effect'),
-        th(colspan = 1, 'Evaluation of small study effects'),
-        th(colspan = 1, 'Qualitative merging / overall bias')
+        th(rowspan = 2, colspan=2, ' '),
+        th(rowspan = 2, colspan = 1, 'Comparison'),
+        th(rowspan = 1, colspan =3, '% contribution from comparisons with suspected bias'),
+        th(rowspan = 2, colspan = 1, 'Evaluation of contribution of comparisons with suspected bias'),
+        th(rowspan = 2, colspan = 1, 'Bias assessment for direct comparisons (observed and unobserved) from Table 1'),
+        th(rowspan = 2, colspan = 1, "NMA treatment effect"),
+        th(rowspan = 2, colspan = 1, 'NMR treatment effect at the smallest observed variance'),
+        th(rowspan = 2, colspan = 1, 'Evaluation of small study effects'),
+        th(rowspan = 2, colspan = 1, 'Overall risk of bias')
+      ),
+      tr(
+        th(colspan = 1, 'Favouring first treatment'),
+        th(colspan = 1, 'Favouring second treatment'),
+        th(colspan = 1, 'Total from all comparisons')
       )
     )
   ))
@@ -318,6 +323,12 @@ server <- function(input, output, session) {
     state$table2 <- mutate(state$table2, final = proposedFinal)
   })
   
+  observeEvent(input$setSSEUndetected, {
+    print("Setting SSE to Undetected")
+    state$table2 <- mutate(state$table2, effectsEvaluation = 1)
+    state$table2$proposedFinal <- table2proposedFinal(state$table2)
+  })
+  
   observeEvent(input$resetTable2Finals, {
     print("Resetting final column")
     state$table2 <- mutate(state$table2, final = 0)
@@ -341,7 +352,7 @@ Unobserved"
                      , "Undetected bias"
                      , paste("Suspected bias favouring ",treat1,sep="")
                      , paste("Suspected bias favouring ",treat2,sep="")
-                     , "Unclear")
+          )
         }
       }else{
         choices = c( ""
@@ -419,19 +430,19 @@ Unobserved"
     class = 'display',
     thead(
       tr(
-        th(rowspan = 2, '-'),
-        th(rowspan = 2, 'Comparisons'),
+        th(rowspan = 2, ' '),
+        th(rowspan = 2, 'Comparison'),
         th(rowspan = 2, 'group'),
         th(colspan = 2, 'Number of studies in each comparison'),
-        th(colspan = 1, 'known unknowns'),
-        th(colspan = 1, 'unknowns unknowns'),
-        th(colspan = 1, 'overall bias')
+        th(colspan = 1, 'Known unknowns'),
+        th(colspan = 1, 'Unknowns unknowns'),
+        th(colspan = 1, 'Overall bias')
       ),tr(
         th(colspan = 1, 'Reporting this outcome (sample size)'),
         th(colspan = 1, 'Total identified in the SR (total sample size)'),
         th(colspan = 1, 'Classification system (e.g. ORBIT)'),
         th(colspan = 1, 'Qualitative signals and quantitative considerations'),
-        th(colspan = 1, 'Algorithm for merging of previous assessments')
+        th(colspan = 1, 'Synthesizing judgements')
       )
     )
   ))
@@ -496,7 +507,9 @@ Unobserved"
                                   effects= eff)
       }
       results <- BUGSnet::nma.run(model,
-                           n.iter=1000)
+                                  n.burnin=2000,
+                                  n.iter=10000,
+                                  n.chains = 2)
       return(results)
   }
   
@@ -589,7 +602,7 @@ Unobserved"
   })
   
   output$netgraph <- renderPlot({
-    netgraph(getNMA(), cex = 0.7, col = "black", plastic=FALSE, 
+    netgraph(getNMA(), col = "black", plastic=FALSE, 
              points=T, col.points = "darkgreen", cex.points =10*sqrt(n.trts/max(n.trts)),  
              thickness="number.of.studies", lwd.max = 12, lwd.min = 1, multiarm=F)
   })
@@ -612,12 +625,21 @@ Unobserved"
   })
   output$netinfo <- renderTable({
     btab()$network
-  })
+  }, colnames = FALSE)
   output$intinfo <- renderTable({
-    btab()$intervention
+    out <- btab()$intervention
+    #Change here colnames
+    if(state$allData$isBinary==T){
+      colnames(out) <- c("treatment","number of studies","patients","minimum outcome","maximum","average","last")
+    }else{
+      colnames(out) <- c("treatment","number of studies","patients","minimum outcome","maximum","average")
+    }
+    out
   })
   output$compinfo <- renderTable({
-    btab()$comparison
+    out <- btab()$comparison
+    #Change here colnames using the code from above
+    out
   })
     
 
@@ -628,13 +650,13 @@ Unobserved"
     state$bleague <- BUGSnet::nma.league(state$bnma,
                central.tdcy="median",
                order = nma.rank(state$bnma, largerbetter=ifelse(input$inputBH=="good", F, T))$order,
-               log.scale = FALSE,
-               low.colour = "springgreen4",
-               mid.colour = "white",
-               high.colour = "red")
+               log.scale = FALSE
+               )
     
       output$forest <- renderPlot({
-        BUGSnet::nma.forest(state$bnma, comparator = state$inputRef)
+        BUGSnet::nma.forest(state$bnma, comparator = state$inputRef) +
+          ylab(paste(input$inputSM, "relative to", input$inputRef )) +
+          theme(axis.text = element_text(size=15))
       })
       
       output$league <- renderTable({
@@ -683,7 +705,9 @@ Unobserved"
                             covariate = "varStudies",
                             prior.beta = "UNRELATED")
   state$bnmr <- BUGSnet::nma.run(model,
-                       n.iter=1000)
+                                 n.burnin=state$burnin,
+                                 n.iter=state$numIter,
+                                 n.chains = 2)
   state$bnmrDone <- T
   print("bnmr is Done")
   },ignoreInit=T)
@@ -697,18 +721,26 @@ Unobserved"
                                  , largerbetter=ifelse(state$inputBH=="good", F, T)
                                  , cov.value = min(state$NMRdata$arm.data$varStudies)
                                  )$order
-               , log.scale = FALSE,
-               , low.colour = "springgreen4"
-               , mid.colour = "white"
-               , high.colour = "red"
+               , log.scale = FALSE
                , cov.value = min(state$NMRdata$arm.data$varStudies)
                )
       state$nmrleague <- nmrleague
-      output$nmr <- renderPlot({
-        nmrleague$heatplot
+      output$nmr <- renderTable({
+        nmrleague$table
+      }, rownames = T)
+      
+      output$rhat <- renderText({
+        nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf
       })
+      
+      output$rhatPlots <- renderPlot({
+        nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf
+      })
+      
       output$nmrplot <- renderPlot({
-        nma.regplot(state$bnmr)
+        nma.regplot(state$bnmr) + 
+          xlab("Study variance of the (linear) treatment effect") +
+          ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
       })
       output$minvar <- renderText({
         min(state$NMRdata$arm.data$varStudies)
@@ -765,9 +797,9 @@ Unobserved"
              need(state$bnmrDone == T, "bnmr not Done"))
      print("calculating contribution")
      cm <- netcontrib(state$nma, state$inputMod)
-     state$contr <- round(cm, digits = 2) %>% mutate(comparison=rownames(cm)) %>% relocate(comparison)
+     state$contr <- round(cm, digits = 1) %>% mutate(comparison=rownames(cm)) %>% relocate(comparison)
      print("calculated contribution matrix")
-     output$contr <- shiny::renderTable(state$contr, digits=2)
+     output$contr <- shiny::renderTable(state$contr, digits=1)
   }, ignoreInit=T, ignoreNULL = T)
   
   output$table1download <- downloadHandler(                         
@@ -884,7 +916,8 @@ Unobserved"
            , need(nrow(state$table1)!="0","table1 empty"))
       tags$div(
         # actionButton("resetTable2Finals", "Delete all final overall entries"),
-        actionButton("applyProposedTable2", "Apply proposed values to overall judgement column")
+        actionButton("setSSEUndetected", "Set Evaluation of small study effects to No evidence"),
+        actionButton("applyProposedTable2", "Use algorithm to calculate overall risk of bias judgements")
       )
   })
   
@@ -892,11 +925,11 @@ Unobserved"
    validate(need(state$nma != "", "netmeta not ready")
            , need(nrow(state$table1)!="0","table1 empty"))
       tags$div(
-        actionButton("setKnownsUndetected","set known unknowns Undetected"),
-        actionButton("unsetKnowns","unset known unknowns"),
-        actionButton("setUnknownsUndetected","set unknown unknowns Undetected"),
-        actionButton("unsetUnknowns","unset unknown unknowns"),
-        actionButton("applyProposedTable1", "Apply proposed values to overall bias column")
+        actionButton("setKnownsUndetected","Set known unknowns undetected"),
+        actionButton("unsetKnowns","Unset known unknowns"),
+        actionButton("setUnknownsUndetected","Set unknown unknowns undetected"),
+        actionButton("unsetUnknowns","Unset unknown unknowns"),
+        actionButton("applyProposedTable1", tags$b(style="color:blue","Use algorithm to calculate overall bias"))
       )
   })
   
@@ -907,7 +940,12 @@ Unobserved"
       chs = c("Desirable" = "good",
               "Undesirable" = "bad")
     }else{
-      chs = state$inputBH
+      if(state$inputBH == "good"){
+        chs = c("Desirable" = "good")
+        
+      }else{
+        chs = c("Undesirable" = "bad")
+      }
     }
    radioButtons(inputId = "inputBH",
                 label = "Smaller outcome values are",
@@ -920,10 +958,14 @@ Unobserved"
       chs = c("Random effects" = "random",
               "Fixed effects" = "fixed")
     }else{
-      chs = state$inputMod
+      if(state$inputMod == "fixed") {
+        chs = c("Fixed effects" = "fixed")
+      }else{
+        chs = c("Random effects" = "random")
+      }
     }
    radioButtons(inputId = "inputMod",
-                label = "Model",
+                label = "Synthesis model",
                 selected = state$inputMod,
                 choices = chs
                 )
@@ -941,17 +983,53 @@ Unobserved"
                  choices = chs)
   }) 
   
+  output$bugsnetOptions <- renderUI({
+    if(state$analysisStarted == F ){
+      bin = state$burnin
+      iter = state$numIter
+      tags$div(
+        tags$h3("Parameters for the Bayesian meta-regression"),
+        numericInput(
+          inputId = "burnin",
+          label = "Burn In",
+          value = bin,
+          min = 2000,
+          max = NA,
+          step = NA,
+          width = NULL
+        ),
+        numericInput(
+          inputId = "numIter",
+          label = "Iterations",
+          value = iter,
+          min = 10000,
+          max = NA,
+          step = 10,
+          width = NULL
+        )
+      )
+    }else{
+      tags$div(
+        tags$h4("Burn In"),
+        tags$h5(state$burnin),
+        tags$h4("Iterations"),
+        tags$h5(state$numIter)
+      )
+    }
+  })
+  
  output$DataSummary <- renderUI({
     validate(
       need(state$analysisStarted == T, "Analysis parameters not set")
     )
     tags$div(
+             h4("Network graph", align="center"),
              plotOutput("netgraph"),
-             h4("Network info", align = "left"),
+             h4("Network characteristics", align = "left"),
              tableOutput("netinfo"),
              h4("Interventions characteristics", align = "left"),
-            tableOutput("intinfo"),
-            h4("Direct comparisons", align = "left"),
+             tableOutput("intinfo"),
+             h4("Direct comparisons characteristics", align = "left"),
              tableOutput("compinfo")
              )
  })
@@ -973,6 +1051,15 @@ Unobserved"
      state$inputSM <- input$inputSM
    }
  )
+ 
+ observeEvent(input$numIter,
+    state$numIter <- input$numIter
+ )
+ 
+ observeEvent(input$burnin,
+    state$burnin <- input$burnin
+ )
+ 
  observeEvent(input$inputMod,
     state$inputMod <- input$inputMod
  )
@@ -1035,6 +1122,7 @@ Unobserved"
    uiOutput("bhOptions"),
    uiOutput("ModelOptions"),
    uiOutput("ref"),
+   uiOutput("bugsnetOptions")
    )
  })
  
@@ -1043,7 +1131,7 @@ Unobserved"
             need(state$bnmaDone == T, "waiting for analysis"))
    
             tags$div(
-              h4("Forest plot", align = "center"),
+              h4("Posterior medians and 95% Cr.I.", align = "center"),
               conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                                tags$div(id = "plot-container5", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner1")),
                                tags$div("Please wait. The calculations of network meta-analysis may take up to several minutes.",id="loadmessage5")),
@@ -1053,7 +1141,8 @@ Unobserved"
               conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                                tags$div(id = "plot-container6", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner2")),
                                tags$div("Please wait. The calculations of network meta-analysis may take up to several minutes.",id="loadmessage6")),
-              div(tableOutput("league"), align = "center")
+              div(tableOutput("league"), align = "center"),
+              h6(paste(state$inputSM, "and 95% credible intervals of treatment in the column versus treatment in the row"))
             )
  })
  
@@ -1061,7 +1150,11 @@ Unobserved"
  validate(need(state$bnmrDone == T, "waiting for analysis"))
    isolate({
     tags$div(
-      h4("Network meta-regression plot", align = "center"),
+      h4("Checks for convergence of network meta-regression model", align = "center"),
+      p("If any value is more than 1.01, increase number of iterations and burn-in and rerun analysis"),
+      div(textOutput("rhat"), align= "center"),
+      div(plotOutput("rhatPlots", height = "500px", width = "800px"), align = "center"),
+      h4("Network meta-regression for variance of the (linear) treatment effect", align = "center"),
       conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                        tags$div(id = "plot-container1", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner1")),
                        tags$div("Please wait. The calculations of network meta-regression may take up to several minutes.",id="loadmessage1")),
@@ -1070,8 +1163,8 @@ Unobserved"
       conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                        tags$div(id = "plot-container2", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner2")),
                        tags$div("Please wait. The calculations of network meta-regression may take up to several minutes.",id="loadmessage2")),
-      p("League table showing results for the minimum observed variance value of", textOutput("minvar", inline = T)),
-      div(plotOutput("nmr", height = "500px", width = "800px"), align = "center")
+      p("League table showing results for the minimum observed variance of", textOutput("minvar", inline = T), align= "center"),
+      div(tableOutput("nmr"), align = "center")
     )
    })
  })
@@ -1079,10 +1172,21 @@ Unobserved"
  output$mainPanel <- renderUI({
    if(state$analysisStarted == T){
                  tabsetPanel(
-                   tabPanel("DataSummary",uiOutput("DataSummary")),
+                   tabPanel("Data Summary",uiOutput("DataSummary")),
                    tabPanel("Frequentist network meta-analysis", verbatimTextOutput("summary")),
                    tabPanel("Bayesian network meta-analysis", uiOutput("bayesianNMA")),
-                   tabPanel("Bayesian network meta-regression", uiOutput("bayesianNMR"))
+                   tabPanel("Bayesian network meta-regression", uiOutput("bayesianNMR")),
+                   tabPanel("Evaluation of pairwise comparisons",
+                            tabPanel("Contour-enhanced funnel plots", 
+                                     uiOutput("funnelplots")
+                            )
+                   ),
+                   tabPanel("Contribution matrix", 
+                            tags$br(),   # line break
+                            p("Each cell entry provides the percentage contribution that the direct comparison (column) makes to the calculation of the corresponding NMA relative treatment effect (row)."),
+                            tags$br(),   # line break
+                            tableOutput("contr"),
+                            downloadButton('mydownload2', 'Download Contribution Matrix'))
                  )
    }else{
      tags$h4("analysis not started")
@@ -1173,7 +1277,7 @@ Unobserved"
 
 
 ui <- fluidPage(
-  titlePanel("Framework for reporting bias in network meta-analysis"),
+  titlePanel("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis"),
   tags$script(src = "tables.js") ,
   tags$head(tags$style(HTML(mycss))),
   
@@ -1184,26 +1288,14 @@ ui <- fluidPage(
            tabPanel("Data analysis",
                    uiOutput("dataAnalysis")
              ),
-    
-    tabPanel("Evaluation of pairwise comparisons",
-                   tabPanel("Contour-enhanced funnel plots", 
-                            uiOutput("funnelplots")
-                 )
-            ),
-    tabPanel("Evaluation of NMA effects",
-             tabsetPanel(
-               tabPanel("Contribution matrix", 
-                        tableOutput("contr"),
-                        downloadButton('mydownload2', 'Download Contribution Matrix'))
-             )),
-    
-    tabPanel( "Table 1"
+
+    tabPanel( "Pairwise Comparison Table"
             , uiOutput("table1Header")
             , tabPanel("View data", DT::dataTableOutput('table1'))
             , downloadButton('table1download', 'Download Table 1')
             ),
     
-    tabPanel("Table 2"
+    tabPanel("ROB-MEN Table"
             , uiOutput("table2Header")
             , tabPanel("View data", DT::dataTableOutput('table2'))
             , downloadButton('table2download', 'Download Table 2')

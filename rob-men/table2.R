@@ -58,6 +58,9 @@ buildTable2 <- function(table1, contribution.matrix, nmaleague, nmrleague){
       return(sum(bias))
     }
   }
+  formatEffects <- function(efstr) {
+    return(str_replace(efstr, "\\(","<br>\\("))
+  }
   table2 <- table1 %>%
     rename(table1_overall_bias = overall_bias) %>%
     mutate(mixed = namedMixed(compgroup)) %>%
@@ -65,8 +68,10 @@ buildTable2 <- function(table1, contribution.matrix, nmaleague, nmrleague){
     mutate(contrTreat2 = suppressWarnings(getBiasContribution(comparison, treat2))) %>%
     mutate(contrTreat3 = suppressWarnings(getBiasContribution(comparison))) %>%
     mutate(contrEvaluation = 0) %>%
-    mutate(nmaEffect = nmaleague[treat1,treat2]) %>%
-    mutate(nmrEffect = nmrleague[treat1,treat2]) %>%
+    mutate(nmaEffect = nmaleague[treat2,treat1]) %>%
+    mutate(nmaEffect = formatEffects(nmaEffect)) %>%
+    mutate(nmrEffect = nmrleague[treat2,treat1]) %>%
+    mutate(nmrEffect = formatEffects(nmrEffect)) %>%
     mutate(effectsEvaluation = 0) %>%
     mutate(proposedFinal = 0) %>%
     mutate(final = 0) %>%
