@@ -250,13 +250,13 @@ server <- function(input, output, session) {
     thead(
       tr(
         th(rowspan = 2, colspan=2, ' '),
-        th(rowspan = 2, colspan = 1, 'Comparison'),
-        th(rowspan = 1, colspan =3, '% contribution from comparisons with suspected bias'),
-        th(rowspan = 2, colspan = 1, 'Evaluation of contribution of comparisons with suspected bias'),
-        th(rowspan = 2, colspan = 1, 'Bias assessment for direct comparisons (observed and unobserved) from Table 1'),
+        th(rowspan = 2, colspan = 1, 'NMA estimate'),
+        th(rowspan = 1, colspan =3, '% contribution of evidence from pairwise comparisons with suspected bias'),
+        th(rowspan = 2, colspan = 1, 'Evaluation of contribution from evidence with suspected bias'),
+        th(rowspan = 2, colspan = 1, 'Bias assessment for indirect evidence'),
         th(rowspan = 2, colspan = 1, "NMA treatment effect"),
         th(rowspan = 2, colspan = 1, 'NMR treatment effect at the smallest observed variance'),
-        th(rowspan = 2, colspan = 1, 'Evaluation of small study effects'),
+        th(rowspan = 2, colspan = 1, 'Evaluation of small-study effects'),
         th(rowspan = 2, colspan = 1, 'Overall risk of bias')
       ),
       tr(
@@ -431,7 +431,7 @@ Unobserved"
     thead(
       tr(
         th(rowspan = 2, ' '),
-        th(rowspan = 2, 'Comparison'),
+        th(rowspan = 2, 'Pairwise comparison'),
         th(rowspan = 2, 'group'),
         th(colspan = 2, 'Number of studies in each comparison'),
         th(colspan = 1, 'Known unknowns'),
@@ -440,8 +440,8 @@ Unobserved"
       ),tr(
         th(colspan = 1, 'Reporting this outcome (sample size)'),
         th(colspan = 1, 'Total identified in the SR (total sample size)'),
-        th(colspan = 1, 'Classification system (e.g. ORBIT)'),
-        th(colspan = 1, 'Qualitative signals and quantitative considerations'),
+        th(colspan = 1, 'Classification system & signalling questions'),
+        th(colspan = 1, 'Qualitative signals & quantitative considerations'),
         th(colspan = 1, 'Synthesizing judgements')
       )
     )
@@ -630,15 +630,20 @@ Unobserved"
     out <- btab()$intervention
     #Change here colnames
     if(state$allData$isBinary==T){
-      colnames(out) <- c("treatment","number of studies","patients","minimum outcome","maximum","average","last")
+      colnames(out) <- c("Intervention","Total no. of studies", "Total no. of events", "Total no. of patients","Min observed event rate","Max observed event rate","Average event rate")
     }else{
-      colnames(out) <- c("treatment","number of studies","patients","minimum outcome","maximum","average")
+      colnames(out) <- c("Intervention","Total no. of studies", "Total no. of patients","Min outcome value","Max outcome value","Average outcome value")
     }
     out
   })
   output$compinfo <- renderTable({
     out <- btab()$comparison
     #Change here colnames using the code from above
+    if(state$allData$isBinary==T){
+      colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients","Total no. of events","Average event rate")
+    }else{
+      colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients")
+    }
     out
   })
     
@@ -729,13 +734,18 @@ Unobserved"
         nmrleague$table
       }, rownames = T)
       
-      output$rhat <- renderText({
-        nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf
-      })
+      output$rhat <- renderTable({
+        nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf[,-2]
+      }, rownames = T, colnames = F)
       
-      output$rhatPlots <- renderPlot({
-        nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf
-      })
+      output$tracedownload <- downloadHandler(
+        filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
+        content = function(file) { 
+          pdf(file)
+          nma.diag(state$bnmr,plot_prompt = F)
+          dev.off()
+        },
+        contentType = 'pdf')
       
       output$nmrplot <- renderPlot({
         nma.regplot(state$bnmr) + 
@@ -916,7 +926,7 @@ Unobserved"
            , need(nrow(state$table1)!="0","table1 empty"))
       tags$div(
         # actionButton("resetTable2Finals", "Delete all final overall entries"),
-        actionButton("setSSEUndetected", "Set Evaluation of small study effects to No evidence"),
+        actionButton("setSSEUndetected", "Set Evaluation of small-study effects to No evidence"),
         actionButton("applyProposedTable2", "Use algorithm to calculate overall risk of bias judgements")
       )
   })
@@ -1141,7 +1151,7 @@ Unobserved"
               conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                                tags$div(id = "plot-container6", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner2")),
                                tags$div("Please wait. The calculations of network meta-analysis may take up to several minutes.",id="loadmessage6")),
-              div(tableOutput("league"), align = "center"),
+              div(tableOutput("league"), style = "font-size:80%", align = "center"),
               h6(paste(state$inputSM, "and 95% credible intervals of treatment in the column versus treatment in the row"))
             )
  })
@@ -1151,9 +1161,10 @@ Unobserved"
    isolate({
     tags$div(
       h4("Checks for convergence of network meta-regression model", align = "center"),
-      p("If any value is more than 1.01, increase number of iterations and burn-in and rerun analysis"),
-      div(textOutput("rhat"), align= "center"),
-      div(plotOutput("rhatPlots", height = "500px", width = "800px"), align = "center"),
+      p("Check the trace plots and the Gelman-Rubin diagnostic values being close to 1 for convergence. If needed, increase number of iterations and burn-in and rerun analysis"),
+      div(tableOutput("rhat"), align= "center"),
+      downloadButton('tracedownload', 'Download Trace Plots as PDF'),
+      #div(plotOutput("rhatPlots", height = "500px", width = "800px"), align = "center"),
       h4("Network meta-regression for variance of the (linear) treatment effect", align = "center"),
       conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                        tags$div(id = "plot-container1", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner1")),
@@ -1164,7 +1175,7 @@ Unobserved"
                        tags$div(id = "plot-container2", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner2")),
                        tags$div("Please wait. The calculations of network meta-regression may take up to several minutes.",id="loadmessage2")),
       p("League table showing results for the minimum observed variance of", textOutput("minvar", inline = T), align= "center"),
-      div(tableOutput("nmr"), align = "center")
+      div(tableOutput("nmr"), style = "font-size:80%", align = "center")
     )
    })
  })
@@ -1176,7 +1187,7 @@ Unobserved"
                    tabPanel("Frequentist network meta-analysis", verbatimTextOutput("summary")),
                    tabPanel("Bayesian network meta-analysis", uiOutput("bayesianNMA")),
                    tabPanel("Bayesian network meta-regression", uiOutput("bayesianNMR")),
-                   tabPanel("Evaluation of pairwise comparisons",
+                   tabPanel("Funnel plots and test for small-study effects",
                             tabPanel("Contour-enhanced funnel plots", 
                                      uiOutput("funnelplots")
                             )
