@@ -637,10 +637,10 @@ Unobserved"
     out
   })
   output$compinfo <- renderTable({
-    out <- btab()$comparison
+    out <- btab()$comparison[,-5]
     #Change here colnames using the code from above
     if(state$allData$isBinary==T){
-      colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients","Total no. of events","Average event rate")
+      colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients","Total no. of events")
     }else{
       colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients")
     }
@@ -998,7 +998,7 @@ Unobserved"
       bin = state$burnin
       iter = state$numIter
       tags$div(
-        tags$h3("Parameters for the Bayesian meta-regression"),
+        tags$h5(tags$b("Parameters for the Bayesian network meta-regression")),
         numericInput(
           inputId = "burnin",
           label = "Burn In",
@@ -1020,10 +1020,11 @@ Unobserved"
       )
     }else{
       tags$div(
-        tags$h4("Burn In"),
-        tags$h5(state$burnin),
-        tags$h4("Iterations"),
-        tags$h5(state$numIter)
+        tags$h5(tags$b("Parameters for the Bayesian network meta-regression")),
+        tags$h5("Burn In"),
+        tags$h6(state$burnin),
+        tags$h5("Iterations"),
+        tags$h6(state$numIter)
       )
     }
   })
@@ -1166,6 +1167,8 @@ Unobserved"
       downloadButton('tracedownload', 'Download Trace Plots as PDF'),
       #div(plotOutput("rhatPlots", height = "500px", width = "800px"), align = "center"),
       h4("Network meta-regression for variance of the (linear) treatment effect", align = "center"),
+      p("Each line shows how the linear effect of each treatment versus reference changes for different study variances.
+        The value at variance 0 are the extrapolated linear effects of each treatment versus reference for an imaginary study with 0 variance."),
       conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                        tags$div(id = "plot-container1", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner1")),
                        tags$div("Please wait. The calculations of network meta-regression may take up to several minutes.",id="loadmessage1")),
