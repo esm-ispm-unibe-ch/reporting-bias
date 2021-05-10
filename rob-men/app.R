@@ -1264,7 +1264,7 @@ Unobserved"
        mainPanel(
          tabsetPanel(
            tabPanel("Instructions",      # section division
-                    tags$h4("This tab provides instructions for", tags$b("long format"), "data, where each row contains one treatment arm. Please follow the steps below."), 
+                    tags$h4("This tab provides instructions for", tags$b("long format"), "data, where each row contains one treatment arm", tags$u("for all studies identified in the systematic review, including those not reporting the outcome of interest."), "Please follow the steps below."), 
                     tags$br(),   # line break
                     tags$h5("The long format data file should contain five columns (for binary data) or six columns (for continuous data) labelled as follows:"),
                     tags$ul(
@@ -1272,9 +1272,9 @@ Unobserved"
                       tags$li("Column", tags$i(tags$b("study")), "containing the name (e.g., author,year) of the study."),
                       tags$li("Column", tags$i(tags$b("t")), "containing the treatment code used in each arm of the study."),
                       tags$li("Column", tags$i(tags$b("n")), "containing the number of participants in each arm of the study."),
-                      tags$li(tags$i("(For binary data)"),"Column", tags$i(tags$b("r")), "containing the number of participants with the outcome of interest in each arm of the study."),
-                      tags$li(tags$i("(For continuous data)"),"Column", tags$i(tags$b("mean")), "the mean value of the outcome in each arm of the study."),
-                      tags$li(tags$i("(For continuous data)"),"Column", tags$i(tags$b("sd")), "the standard deviation of the outcome in each arm of the study.")
+                      tags$li(tags$i("(For binary data)"),"Column", tags$i(tags$b("r")), "containing the number of participants with the outcome of interest in each arm of the study.", tags$u("For studies not reporting the outcome of interest this should be empty or contain an asterisk")),
+                      tags$li(tags$i("(For continuous data)"),"Column", tags$i(tags$b("mean")), "the mean value of the outcome in each arm of the study.", tags$u("For studies not reporting the outcome of interest this should be empty or contain an asterisk")),
+                      tags$li(tags$i("(For continuous data)"),"Column", tags$i(tags$b("sd")), "the standard deviation of the outcome in each arm of the study.", tags$u("For studies not reporting the outcome of interest this should be empty or contain an asterisk"))
                     )
                     ),
            tabPanel("View data", DT::dataTableOutput('contents'))
