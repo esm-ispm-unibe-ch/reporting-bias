@@ -1264,7 +1264,7 @@ Unobserved"
        mainPanel(
          tabsetPanel(
            tabPanel("Instructions",      # section division
-                    tags$h4("This tab provides instructions for long format data, where each row contains one treatment arm", tags$u("for all studies identified in the systematic review, including those not reporting the outcome of interest."), "Please follow the steps below."), 
+                    tags$h4("This tab provides instructions for", tags$b("long format"), "data, where each row contains one treatment arm", tags$u("for all studies identified in the systematic review, including those not reporting the outcome of interest."), "Please follow the steps below."), 
                     tags$br(),   # line break
                     tags$h5("The long format data file should contain five columns (for binary data) or six columns (for continuous data) labelled as follows:"),
                     tags$ul(
