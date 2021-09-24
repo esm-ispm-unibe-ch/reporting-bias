@@ -434,15 +434,15 @@ Unobserved"
         th(rowspan = 2, 'Pairwise comparison'),
         th(rowspan = 2, 'group'),
         th(colspan = 2, 'Number of studies in each comparison'),
-        th(colspan = 1, 'Known unknowns'),
-        th(colspan = 1, 'Unknowns unknowns'),
+        th(colspan = 1, 'Within study assessment of bias'),
+        th(colspan = 1, 'Across study assessment of bias'),
         th(colspan = 1, 'Overall bias')
       ),tr(
         th(colspan = 1, 'Reporting this outcome (sample size)'),
         th(colspan = 1, 'Total identified in the SR (total sample size)'),
-        th(colspan = 1, 'Classification system & signalling questions'),
-        th(colspan = 1, 'Qualitative signals & quantitative considerations'),
-        th(colspan = 1, 'Synthesizing judgements')
+        th(colspan = 1, 'Evaluation of selective reporting within studies using signalling questions'),
+        th(colspan = 1, 'Qualitative and quantitative assessment of publication bias'),
+        th(colspan = 1, 'Overall judgement')
       )
     )
   ))
@@ -927,7 +927,7 @@ Unobserved"
       tags$div(
         # actionButton("resetTable2Finals", "Delete all final overall entries"),
         actionButton("setSSEUndetected", "Set Evaluation of small-study effects to No evidence"),
-        actionButton("applyProposedTable2", "Use algorithm to calculate overall risk of bias judgements")
+        actionButton("applyProposedTable2", tags$b(style="color:blue","Use algorithm to calculate overall risk of bias judgements"))
       )
   })
   
@@ -935,10 +935,10 @@ Unobserved"
    validate(need(state$nma != "", "netmeta not ready")
            , need(nrow(state$table1)!="0","table1 empty"))
       tags$div(
-        actionButton("setKnownsUndetected","Set known unknowns undetected"),
-        actionButton("unsetKnowns","Unset known unknowns"),
-        actionButton("setUnknownsUndetected","Set unknown unknowns undetected"),
-        actionButton("unsetUnknowns","Unset unknown unknowns"),
+        actionButton("setKnownsUndetected","Set Within study assessment of bias as undetected"),
+        actionButton("unsetKnowns","Unset Within study assessment of bias"),
+        actionButton("setUnknownsUndetected","Set Across study assessment of bias as undetected"),
+        actionButton("unsetUnknowns","Unset Across study assessment of bias "),
         actionButton("applyProposedTable1", tags$b(style="color:blue","Use algorithm to calculate overall bias"))
       )
   })
