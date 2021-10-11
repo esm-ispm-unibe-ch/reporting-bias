@@ -933,10 +933,17 @@ Unobserved"
    validate(need(state$nma != "", "netmeta not ready")
            , need(nrow(state$table1)!="0","table1 empty"))
       tags$div(
+<<<<<<< HEAD
         actionButton("setKnownsUndetected","Set Within-study assessment as No bias detected"),
         actionButton("unsetKnowns","Unset Within-study assessment of bias"),
         actionButton("setUnknownsUndetected","Set Across-study assessment as No bias detected"),
         actionButton("unsetUnknowns","Unset Across-study assessment of bias "),
+=======
+        actionButton("setKnownsUndetected","Set Within study assessment of bias as undetected"),
+        actionButton("unsetKnowns","Unset Within study assessment of bias"),
+        actionButton("setUnknownsUndetected","Set Across study assessment of bias as undetected"),
+        actionButton("unsetUnknowns","Unset Across study assessment of bias "),
+>>>>>>> 9372742cfe94370d7962563f375480027e369a1f
         actionButton("applyProposedTable1", tags$b(style="color:blue","Use algorithm to calculate overall bias"))
       )
   })
@@ -1333,7 +1340,27 @@ ui <- fluidPage(
             , downloadButton('table2download', 'Download Table 2')
     )
             
-  )
+  ),
+  tags$footer("Please cite ROB-MEN as", tags$i("Chiocchia V et al. Tool to assess risk of bias due to missing evidence in network meta-analysis (ROB-MEN): elaboration and examples. medRxiv 2021; doi: https://doi.org/10.1101/2021.05.02.21256160."), 
+  tags$br(), "ROB-MEN is distributed, in the hope that it will be useful but without any warranty, under the ", tags$a(href='LICENSE.txt', target='blank', 'GNU General Public License', download = 'LICENSE.txt'), 
+  ". By using ROB-MEN you accept the ", tags$a(href='DISCLAIMER.txt', target='blank', 'DISCLAIMER.', download = 'DISCLAIMER.txt'), align = "center", style = "
+              position:absolute;
+              bottom:0;
+              width:100%;
+              height:100px;
+              color: darkblue;
+              background: lightblue;
+              padding: 10px;
+              z-index: 1000;"),
+  tags$footer(tags$img(src = "Asset 2@3x.png", width = "200px", height = "75px"), align = "right", style = "
+              position:absolute;
+              bottom:0;
+              z-index: 1000;"),
+  tags$footer(tags$img(src = "Asset 2@2x.png", width = "100px", height = "100px"), align = "right", style = "
+              position:absolute;
+              bottom:0;
+              width: 98%;
+              z-index: 1000;")
 )
 
 shinyApp(ui = ui, server = server)
