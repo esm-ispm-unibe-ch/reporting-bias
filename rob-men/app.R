@@ -3,7 +3,6 @@ library(data.table)
 library(DT)
 library(dplyr)
 require(tidyverse)
-library(shinythemes)
 
 
 library(devtools)
@@ -14,6 +13,7 @@ load_all("helpers")
 # library(reportingbias)
 library(netmeta)
 library(xlsx)
+library(shinythemes)
 library(BUGSnet)
 
 source("./css.R")
