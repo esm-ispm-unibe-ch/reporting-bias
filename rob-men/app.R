@@ -13,7 +13,7 @@ load_all("helpers")
 # library(reportingbias)
 library(netmeta)
 library(xlsx)
-library(shinythemes)
+#library(shinythemes)
 library(BUGSnet)
 
 source("./css.R")
@@ -1291,7 +1291,7 @@ Unobserved"
 
 
 ui <- fluidPage(
-  theme=shinytheme("yeti"),
+  #theme=shinytheme("yeti"),
   titlePanel(tags$b("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis")),
   tags$script(src = "tables.js") ,
   tags$head(tags$style(HTML(mycss))),
