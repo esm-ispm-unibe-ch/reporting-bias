@@ -3,6 +3,8 @@ library(data.table)
 library(DT)
 library(dplyr)
 require(tidyverse)
+library(shinythemes)
+
 
 library(devtools)
 # install_github("esm-ispm-unibe-ch/reportingbias")
@@ -169,7 +171,7 @@ server <- function(input, output, session) {
     overallWeb <- function(comparison,treat1,treat2,
                            table1_overall_bias,mixed){
         choices = c( ""
-                   , "Undetected bias"
+                   , "No bias detected"
                    , paste("Suspected bias favouring ",treat1,sep="")
                    , paste("Suspected bias favouring ",treat2,sep="")
         )
@@ -236,7 +238,6 @@ server <- function(input, output, session) {
             ,comparison
             ,contrTreat1Web
             ,contrTreat2Web
-            ,contrTreat3Web
             ,contrEvaluationWeb
             ,table1_overall_bias_web
             ,nmaEffect
@@ -251,7 +252,7 @@ server <- function(input, output, session) {
       tr(
         th(rowspan = 2, colspan=2, ' '),
         th(rowspan = 2, colspan = 1, 'NMA estimate'),
-        th(rowspan = 1, colspan =3, '% contribution of evidence from pairwise comparisons with suspected bias'),
+        th(rowspan = 1, colspan =2, '% contribution of evidence from pairwise comparisons with suspected bias'),
         th(rowspan = 2, colspan = 1, 'Evaluation of contribution from evidence with suspected bias'),
         th(rowspan = 2, colspan = 1, 'Bias assessment for indirect evidence'),
         th(rowspan = 2, colspan = 1, "NMA treatment effect"),
@@ -261,8 +262,7 @@ server <- function(input, output, session) {
       ),
       tr(
         th(colspan = 1, 'Favouring first treatment'),
-        th(colspan = 1, 'Favouring second treatment'),
-        th(colspan = 1, 'Total from all comparisons')
+        th(colspan = 1, 'Favouring second treatment')
       )
     )
   ))
@@ -324,7 +324,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$setSSEUndetected, {
-    print("Setting SSE to Undetected")
+    print("Setting SSE to No bias detected")
     state$table2 <- mutate(state$table2, effectsEvaluation = 1)
     state$table2$proposedFinal <- table2proposedFinal(state$table2)
   })
@@ -349,14 +349,14 @@ Unobserved"
       if(column == "known_unknowns"){
         if(groupLabel != groupCLabel){
           choices = c( ""
-                     , "Undetected bias"
+                     , "No bias detected"
                      , paste("Suspected bias favouring ",treat1,sep="")
                      , paste("Suspected bias favouring ",treat2,sep="")
           )
         }
       }else{
         choices = c( ""
-                   , "Undetected bias"
+                   , "No bias detected"
                    , paste("Suspected bias favouring ",treat1,sep="")
                    , paste("Suspected bias favouring ",treat2,sep="")
         )
@@ -434,15 +434,15 @@ Unobserved"
         th(rowspan = 2, 'Pairwise comparison'),
         th(rowspan = 2, 'group'),
         th(colspan = 2, 'Number of studies in each comparison'),
-        th(colspan = 1, 'Known unknowns'),
-        th(colspan = 1, 'Unknowns unknowns'),
+        th(colspan = 1, 'Within study assessment of bias'),
+        th(colspan = 1, 'Across study assessment of bias'),
         th(colspan = 1, 'Overall bias')
       ),tr(
         th(colspan = 1, 'Reporting this outcome (sample size)'),
         th(colspan = 1, 'Total identified in the SR (total sample size)'),
-        th(colspan = 1, 'Classification system & signalling questions'),
-        th(colspan = 1, 'Qualitative signals & quantitative considerations'),
-        th(colspan = 1, 'Synthesizing judgements')
+        th(colspan = 1, 'Evaluation of selective reporting within studies using signalling questions'),
+        th(colspan = 1, 'Qualitative and quantitative assessment of publication bias'),
+        th(colspan = 1, 'Overall judgement')
       )
     )
   ))
@@ -906,7 +906,7 @@ Unobserved"
   })
   
   observeEvent(input$setKnownsUndetected, {
-    print("setting to Undetected")
+    print("setting to No bias detected")
     state$table1 <- mutate(state$table1, known_unknowns = 1) %>%
             mutate(proposed = 
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
@@ -914,7 +914,7 @@ Unobserved"
   })
   
   observeEvent(input$setUnknownsUndetected, {
-    print("setting to Undetected")
+    print("setting to No bias detected")
     state$table1 <- mutate(state$table1, unknown_unknowns = 1) %>%
             mutate(proposed = 
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
@@ -927,7 +927,7 @@ Unobserved"
       tags$div(
         # actionButton("resetTable2Finals", "Delete all final overall entries"),
         actionButton("setSSEUndetected", "Set Evaluation of small-study effects to No evidence"),
-        actionButton("applyProposedTable2", "Use algorithm to calculate overall risk of bias judgements")
+        actionButton("applyProposedTable2", tags$b(style="color:blue","Use algorithm to calculate overall risk of bias judgements"))
       )
   })
   
@@ -935,10 +935,10 @@ Unobserved"
    validate(need(state$nma != "", "netmeta not ready")
            , need(nrow(state$table1)!="0","table1 empty"))
       tags$div(
-        actionButton("setKnownsUndetected","Set known unknowns undetected"),
-        actionButton("unsetKnowns","Unset known unknowns"),
-        actionButton("setUnknownsUndetected","Set unknown unknowns undetected"),
-        actionButton("unsetUnknowns","Unset unknown unknowns"),
+        actionButton("setKnownsUndetected","Set Within-study assessment as No bias detected"),
+        actionButton("unsetKnowns","Unset Within-study assessment of bias"),
+        actionButton("setUnknownsUndetected","Set Across-study assessment as No bias detected"),
+        actionButton("unsetUnknowns","Unset Across-study assessment of bias "),
         actionButton("applyProposedTable1", tags$b(style="color:blue","Use algorithm to calculate overall bias"))
       )
   })
@@ -1291,15 +1291,37 @@ Unobserved"
 
 
 ui <- fluidPage(
-  titlePanel("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis"),
+  theme=shinytheme("yeti"),
+  titlePanel(tags$b("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis")),
   tags$script(src = "tables.js") ,
   tags$head(tags$style(HTML(mycss))),
   
   tags$div(uiOutput("messages")),
   tabsetPanel(
-    tabPanel("Load data", uiOutput("loaddata")),
+    tabPanel("Load data", uiOutput("loaddata"),
+             tags$footer("Please cite ROB-MEN as", tags$i("Chiocchia V. et al. ROB-MEN: a tool to assess risk of bias due to missing evidence in network meta-analysis. BMC Med 19, 304 (2021)."), tags$a(href="https://doi.org/10.1186/s12916-021-02166-3", "DOI: 10.1186/s12916-021-02166-3"),
+                         tags$br(), "ROB-MEN is distributed, in the hope that it will be useful but without any warranty, under the ", tags$a(href='LICENSE.txt', target='blank', 'GNU General Public License.', download = 'LICENSE.txt'), 
+                         "By using ROB-MEN you accept the ", tags$a(href="DISCLAIMER.txt", target="_blank", "DISCLAIMER.", download = "DISCLAIMER.txt"), align = "center", 
+                         style = "position:absolute;
+                                  bottom:0;
+                                  width:100%;
+                                  height:75px;
+                                  color: darkblue;
+                                  background: white;
+                                  padding: 10px;
+                                  z-index: 1000;"),
+             tags$footer(tags$img(src = "Asset 2@3x.png", width = "225px", height = "75px"), align = "right",
+                         style = "position:absolute;
+              bottom:0;
+              z-index: 1000;"),
+             tags$footer(tags$img(src = "Asset 2@2x.png", width = "87px", height = "75px"), align = "right",
+                         style = "position:absolute;
+              bottom:0;
+              right:0;
+              z-index: 1000;"),
+    ),
     
-           tabPanel("Data analysis",
+    tabPanel("Data analysis",
                    uiOutput("dataAnalysis")
              ),
 
