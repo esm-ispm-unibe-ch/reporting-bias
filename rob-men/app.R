@@ -10,10 +10,12 @@ library(devtools)
 # install.packages(netmeta, repos = NULL, type="source")
 # install.packages("reportingbias", repos = NULL, type="source")
 load_all("helpers")
+load_all("shinythemes")
 # library(reportingbias)
 library(netmeta)
 library(xlsx)
 library(shinythemes)
+
 library(BUGSnet)
 
 source("./css.R")
