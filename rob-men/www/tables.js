@@ -1,6 +1,3 @@
-document.body.style.backgroundColor = 'skyblue';
-console.log('hello');
-
 function table1select(id){
   var x = document.getElementById(id).value;
 

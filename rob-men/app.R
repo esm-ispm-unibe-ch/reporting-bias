@@ -10,11 +10,9 @@ library(devtools)
 # install.packages(netmeta, repos = NULL, type="source")
 # install.packages("reportingbias", repos = NULL, type="source")
 load_all("helpers")
-load_all("shinythemes")
 # library(reportingbias)
 library(netmeta)
 library(xlsx)
-library(shinythemes)
 
 library(BUGSnet)
 
@@ -46,25 +44,25 @@ server <- function(input, output, session) {
                          , numIter = 10000
                          , burnin = 2000
                          )
-  
+
   myData <- reactive({state$allData$directs})
-  
+
   observeEvent(input$file1,{
     state$allData <- allMyData(input$file1)
   },ignoreInit=T)
-  
+
   observeEvent(state$allData$directs, {
      res <- unique(state$allData$directs$t) %>% sort()
      state$treatments <- res
      state$bdata <- bdata(state$allData$directs)
      print("bdata calculated")
   })
-  
+
   observeEvent(state$inputMod,{
     state$modelFixed <- input$inputMod=="fixed"
     state$modelRandom <- input$inputMod=="random"
   },ignoreNULL=T)
-  
+
   observeEvent(state$analysisStarted, {
     if(state$analysisStarted == T){
       print("starting NMA")
@@ -76,13 +74,13 @@ server <- function(input, output, session) {
       state$nmaDone = F
     }
   }, ignoreNULL=T)
-  
+
   observeEvent(state$nmaDone, {
    validate(need(state$nmaDone == T, "netmeta not ready")
            )
       state$table1 <- buildTable1(state$treatments, state$allData$directs, state$allData$otherOutcomes, state$allData$isBinary)
   })
-  
+
   observe({
     validate(need(state$analysisStarted == T, "Analysis in progress..."),
              need(nrow(state$table1) > "0", "table1 not ready"),
@@ -97,12 +95,12 @@ server <- function(input, output, session) {
       }
     })
   })
-  
+
   output$table2 <- DT::renderDataTable({
     validate(need(state$analysisStarted == T, "analysis not started"),
              need(nrow(state$table1) != "0", "table1 not ready"),
              need(state$contr != "", "contribution matrix not ready"))
-    
+
     table2col4 = function(comparison, treat1, treat2, level){
       choices = c( ""
                  , "No substantial contribution from bias"
@@ -111,9 +109,9 @@ server <- function(input, output, session) {
                  , "Substantial contribution from bias balanced"
                  # , "Substantial but more or less equal contribution from comparisons favouring the opposite treatments"
       )
-      
+
       chs <- tibble::rowid_to_column(as.data.frame(choices), "n")
-        
+
       chs$optiontag = mapply(function(l,choice){
           if(l==level+1){
             selectedstring = " selected"
@@ -129,7 +127,7 @@ server <- function(input, output, session) {
                         ,"</option>", sep="")
           return(optag)
           },chs$n,chs$choices)
-        
+
       res = paste0("<select onchange=table2col4select(id) class=table2_col4 "
                    ,"id='"
                    ,paste("table2col4",comparison,sep="-vs-"),"'>"
@@ -137,16 +135,16 @@ server <- function(input, output, session) {
                    ,"</select>")
       return(res)
     }
-    
+
     table2col8 = function(comparison, treat1, treat2, level){
       choices = c( ""
                  ,"No evidence of small-study effects"
                  , paste("Small-study effects favouring ",treat1,sep="")
                  , paste("Small-study effects favouring ",treat2,sep="")
       )
-      
+
       chs <- tibble::rowid_to_column(as.data.frame(choices), "n")
-        
+
       chs$optiontag = mapply(function(l,choice){
           if(l==level+1){
             selectedstring = " selected"
@@ -162,7 +160,7 @@ server <- function(input, output, session) {
                         ,"</option>", sep="")
           return(optag)
           },chs$n,chs$choices)
-        
+
       res = paste0("<select onchange=table2col8select(id) class=table2_col8 "
                    ,"id='"
                    ,paste("table2col8",comparison,sep="-vs-"),"'>"
@@ -191,7 +189,7 @@ server <- function(input, output, session) {
                  , "High risk"
       )
       chs <- tibble::rowid_to_column(as.data.frame(choices), "n")
-        
+
       chs$optiontag = mapply(function(l,choice){
           if(l==level+1){
             selectedstring = " selected"
@@ -213,13 +211,13 @@ server <- function(input, output, session) {
                         ,"</option>", sep="")
           return(optag)
        },chs$n,chs$choices)
-        
+
        if(proposed != level){
          changedstring = " style='background-color:lightyellow;'"
        }else{
          changedstring = " "
        }
-        
+
       res = paste0("<select onchange=table2finalselect(id) class=table2_selector "
                  ,changedstring
                  ,"id='"
@@ -246,8 +244,8 @@ server <- function(input, output, session) {
             ,nmrEffect
             ,effectsEvaluationWeb
             ,finalWeb
-            ) 
-    
+            )
+
   table2Header = htmltools::withTags(table(
     class = 'display',
     thead(
@@ -268,7 +266,7 @@ server <- function(input, output, session) {
       )
     )
   ))
-  
+
     datatable(table2web,
                   container = table2Header,
                   escape = F,
@@ -282,7 +280,7 @@ server <- function(input, output, session) {
                   )
   }, server=F
   )
-  
+
   observeEvent(input$updateTable2, {
     validate(need(state$analysisStarted == T, "analysis not started"),
              need(nrow(state$table1) > "0", "table1 not ready"),
@@ -290,7 +288,7 @@ server <- function(input, output, session) {
     state$table2 <- rebuildTable2(state$table1, state$contr, state$bleague$table, state$nmrleague$table, state$table2)
     print(c("rebuilded not building",state$table2))
   })
-  
+
   observeEvent(input$table2col4, {
       t2col4 <- input$table2col4
       sel <-  unlist(strsplit(t2col4$id,"-vs-",fixed=T))
@@ -300,7 +298,7 @@ server <- function(input, output, session) {
       state$table2 <- rows_update(state$table2, chr)
       state$table2$proposedFinal <- table2proposedFinal(state$table2)
   },ignoreNULL=T,ignoreInit=T)
-  
+
   observeEvent(input$table2col8, {
       t2col8 <- input$table2col8
       sel <-  unlist(strsplit(t2col8$id,"-vs-",fixed=T))
@@ -310,7 +308,7 @@ server <- function(input, output, session) {
       state$table2 <- rows_update(state$table2, chr)
       state$table2$proposedFinal <- table2proposedFinal(state$table2)
   },ignoreNULL=T,ignoreInit=T)
-  
+
   observeEvent(input$table2final, {
       t2final <- input$table2final
       sel <-  unlist(strsplit(t2final$id,"-vs-",fixed=T))
@@ -319,33 +317,33 @@ server <- function(input, output, session) {
             mutate(final = as.integer(t2final$value))
       state$table2 <- rows_update(state$table2, chr)
   },ignoreNULL=T,ignoreInit=T)
-      
+
   observeEvent(input$applyProposedTable2, {
     print("Applying proposed to Final")
     state$table2 <- mutate(state$table2, final = proposedFinal)
   })
-  
+
   observeEvent(input$setSSEUndetected, {
     print("Setting SSE to No bias detected")
     state$table2 <- mutate(state$table2, effectsEvaluation = 1)
     state$table2$proposedFinal <- table2proposedFinal(state$table2)
   })
-  
+
   observeEvent(input$resetTable2Finals, {
     print("Resetting final column")
     state$table2 <- mutate(state$table2, final = 0)
   })
-  
+
   output$table1 <- DT::renderDataTable({
      validate(need(state$nmaDone == T, "netmeta not ready"))
-    
-    groupALabel = "Group A: 
-observed for this outcome" 
+
+    groupALabel = "Group A:
+observed for this outcome"
     groupBLabel = "Group B:
 observed for other outcomes"
     groupCLabel = "Group C:
 Unobserved"
-    
+
     table1DropDown = function(column,treat1,treat2,comparison,groupLabel,level,proposed){
       choices = c()
       if(column == "known_unknowns"){
@@ -363,10 +361,10 @@ Unobserved"
                    , paste("Suspected bias favouring ",treat2,sep="")
         )
       }
-      
+
       if(length(choices)>0){
         chs <- tibble::rowid_to_column(as.data.frame(choices), "n")
-        
+
         chs$optiontag = mapply(function(l,choice){
             if(l==level+1){
               selectedstring = " selected"
@@ -392,14 +390,14 @@ Unobserved"
                           ,"</option>", sep="")
             return(optag)
             },chs$n,chs$choices)
-       #check if changed from proposed 
+       #check if changed from proposed
        changedstring = " "
        if(column=="overall_bias") {
          if(proposed != level){
            changedstring = " style='background-color:lightyellow;'"
          }
        }
-        
+
         res = paste0("<select onchange=table1select(id) class=table1_selector "
                    ,changedstring
                    ,"id='"
@@ -411,7 +409,7 @@ Unobserved"
       }
       return(res)
     }
-    
+
     labelGroup = function(compgroup) {
       out = ""
       if(compgroup == "groupA"){
@@ -425,9 +423,9 @@ Unobserved"
       }
       return(out)
     }
-    
+
   table1Web <- tibble()
-  
+
   table1Header = htmltools::withTags(table(
     class = 'display',
     thead(
@@ -463,7 +461,7 @@ Unobserved"
              ,unknown_unknownsWeb
              ,overall_biasWeb
              )
-   
+
     datatable(table1Web,
                   container = table1Header,
                   escape = F,
@@ -478,7 +476,7 @@ Unobserved"
 
   }, server=F
   )
-    
+
   observeEvent(state$nmaDone, {
     validate(need(state$bdata !="", "bdata not ready")
             ,need(state$nmaDone == T, "nma not started")
@@ -488,7 +486,7 @@ Unobserved"
       state$bnmaDone = T
       print("bnma done")
   }, ignoreNULL=T, ignoreInit=T)
-   
+
   bnma <- function(sm,bdata,ref,eff){
       if(sm=="OR" | sm=="RR"){
           model <- BUGSnet::nma.model(data=bdata,
@@ -514,7 +512,7 @@ Unobserved"
                                   n.chains = 2)
       return(results)
   }
-  
+
   nma <- function(data, sm, modelFixed, modelRandom){
     getNMA <- function() {
       if(sm == "OR" | sm == "RR"){
@@ -524,7 +522,7 @@ Unobserved"
       pw <- pairwise(treat=t, n=n, mean=mean, sd=sd, data = myData(), studlab = id)
     }
     return(netmeta(TE, seTE, treat1, treat2, studlab, data = pw, sm=sm, n1=n1, n2=n2,
-            comb.fixed = modelFixed, comb.random = modelRandom)  
+            comb.fixed = modelFixed, comb.random = modelRandom)
            )
     }
     tryCatch({ res = getNMA(); res
@@ -533,7 +531,7 @@ Unobserved"
     , error=function(e){print(paste(e));return({})}
     )
   }
-  
+
   allMyData <- function(inFile){
     getData <- function(){
       tryCatch({datarawcomma <- read.csv(inFile$datapath, header = TRUE, sep=',', dec='.')},
@@ -587,39 +585,39 @@ Unobserved"
       return(NULL)
       })
   }
-  
+
   output$contents <- DT::renderDataTable({
-    DT::datatable(myData())       
+    DT::datatable(myData())
   })
-  
+
   output$summary <- renderPrint({
     summary(state$nma)
   })
-  
+
   getNMA <- reactive({
     validate(
       need(state$nma != "", "netmeta not ready")
     )
     state$nma
   })
-  
+
   output$netgraph <- renderPlot({
-    netgraph(getNMA(), col = "black", plastic=FALSE, 
-             points=T, col.points = "darkgreen", cex.points =10*sqrt(n.trts/max(n.trts)),  
+    netgraph(getNMA(), col = "black", plastic=FALSE,
+             points=T, col.points = "darkgreen", cex.points =10*sqrt(n.trts/max(n.trts)),
              thickness="number.of.studies", lwd.max = 12, lwd.min = 1, multiarm=F)
   })
-  
+
   bdata <- function(mydata){
     res <- data.prep(arm.data = mydata,
                 varname.t = "t",
                 varname.s = "id")
     return(res)
   }
-  
+
   btab <- reactive({
     validate(need(state$bdata != "", "bdata not ready")
              ,need(state$parametersSet == T, "parameters not set"))
-    
+
     net.tab(data = state$bdata,
             outcome = ifelse(state$inputSM=="OR" | state$inputSM=="RR", "r", "mean"),
             N = "n",
@@ -648,43 +646,43 @@ Unobserved"
     }
     out
   })
-    
+
 
   observeEvent(state$bnmaDone, {
     validate(need(state$bnmaDone == T, "bnma not ready"))
     print("calculating bnma league")
-    
+
     state$bleague <- BUGSnet::nma.league(state$bnma,
                central.tdcy="median",
                order = nma.rank(state$bnma, largerbetter=ifelse(input$inputBH=="good", F, T))$order,
                log.scale = FALSE
                )
-    
+
       output$forest <- renderPlot({
         BUGSnet::nma.forest(state$bnma, comparator = state$inputRef) +
           ylab(paste(input$inputSM, "relative to", input$inputRef )) +
           theme(axis.text = element_text(size=15))
       })
-      
+
       output$league <- renderTable({
         state$bleague$table
       }, rownames = T)
     },ignoreNULL=T,ignoreInit=T)
-  
-  
-  
+
+
+
   observeEvent(state$nmaDone, {
     validate(need(state$nmaDone == T, "netmeta not ready")
             )
-    print("calculating NMRdata") 
+    print("calculating NMRdata")
     newdata <- pooledVar(state$nma, myData())
     state$NMRdata <- data.prep(arm.data = newdata,
               varname.t = "t",
               varname.s = "id")
-    print("calculated NMRdata") 
+    print("calculated NMRdata")
   }, ignoreNULL=T, ignoreInit=T)
-  
-  
+
+
   observeEvent(state$bnmaDone,{
     validate(
       need(state$NMRdata != "", "NMRdata not ready")
@@ -718,8 +716,8 @@ Unobserved"
   state$bnmrDone <- T
   print("bnmr is Done")
   },ignoreInit=T)
-  
-  
+
+
   observeEvent(state$bnmrDone, {
     validate(need(state$bnmrDone == T, "bnmr not ready"))
     nmrleague <- nma.league(state$bnmr,
@@ -735,22 +733,22 @@ Unobserved"
       output$nmr <- renderTable({
         nmrleague$table
       }, rownames = T)
-      
+
       output$rhat <- renderTable({
         nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf[,-2]
       }, rownames = T, colnames = F)
-      
+
       output$tracedownload <- downloadHandler(
         filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
-        content = function(file) { 
+        content = function(file) {
           pdf(file)
           nma.diag(state$bnmr,plot_prompt = F)
           dev.off()
         },
         contentType = 'pdf')
-      
+
       output$nmrplot <- renderPlot({
-        nma.regplot(state$bnmr) + 
+        nma.regplot(state$bnmr) +
           xlab("Study variance of the (linear) treatment effect") +
           ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
       })
@@ -758,31 +756,31 @@ Unobserved"
         min(state$NMRdata$arm.data$varStudies)
       })
   }, ignoreNULL=T, ignoreInit=T)
-  
+
   observeEvent(state$nmaDone,{
     validate(need(state$nmaDone == T, "netmeta not ready"))
     state$hasFunnels <- !is.null(fp())
   },ignoreNULL=T,ignoreInit=T)
-  
-  fp <- function() { 
+
+  fp <- function() {
     nmafunnel(state$nma, small.values = state$inputBH)
   }
-  
+
   output$fpprint <- renderPrint({
       fp()
   })
-  
+
   output$fptable <- DT::renderDataTable(fp()$tests)
-  
+
   output$plot2 <- renderPlot({
     validate(need(state$nmaDone == T, "netmeta not ready"))
     par(mfrow=c(2,3))
     fp()
   })
-  
+
   output$mydownload <- downloadHandler(
     filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
-    content = function(file) { 
+    content = function(file) {
       pdf(file)
       fp()
       dev.off()
@@ -792,7 +790,7 @@ Unobserved"
   reffp <- function() {
       reffunnel(state$nma, small.values = state$inputBH, ref=state$inputRef)
   }
-  
+
   output$refprint <- renderPrint({
     validate(need(!is.null(reffp())
                  , "There is no comparison including the reference treatment with more than 10 studies"))
@@ -803,7 +801,7 @@ Unobserved"
                  , "There is no comparison including the reference treatment with more than 10 studies"))
      reffp()
   })
-  
+
   observeEvent(state$bnmrDone, {
     validate(need(state$analysisStarted == T, "Analysis not started"),
              need(state$bnmrDone == T, "bnmr not Done"))
@@ -813,22 +811,22 @@ Unobserved"
      print("calculated contribution matrix")
      output$contr <- shiny::renderTable(state$contr, digits=1)
   }, ignoreInit=T, ignoreNULL = T)
-  
-  output$table1download <- downloadHandler(                         
+
+  output$table1download <- downloadHandler(
     filename = "table1.csv",       # name for the downloaded file with extension
     content = function(file) {
       write.csv2(state$table1, file)
     }
   )
-  
-  output$table2download <- downloadHandler(                         
+
+  output$table2download <- downloadHandler(
     filename = function() {paste("table2", ".csv")},       # name for the downloaded file with extension
     content = function(file) {
       write.csv2(state$table2, file)
     }
   )
-  
-  output$mydownload2 <- downloadHandler(                         
+
+  output$mydownload2 <- downloadHandler(
     filename = function() {paste("conributionMatrix", ".xlsx")},       # name for the downloaded file with extension
     content = function(file) {
       write.xlsx(state$contr, file)
@@ -859,7 +857,7 @@ Unobserved"
                   )
     }
   })
-  
+
   proposeTable1Overall <- function(known, unknown) {
     res <- 0
     if(known %in% c(0,1,4)){
@@ -869,7 +867,7 @@ Unobserved"
     }
     return(res)
   }
-  
+
   observeEvent(input$table1select, {
       t1sel <- input$table1select
       sel <-  unlist(strsplit(t1sel$id,"-vs-",fixed=T))
@@ -877,52 +875,52 @@ Unobserved"
       icomparison <- sel[[2]]
       chr = filter(state$table1, icomparison == comparison) %>%
             mutate("{icolumn}" := as.integer(t1sel$value)) %>%
-            mutate(proposed = 
+            mutate(proposed =
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
       state$table1 <- rows_update(state$table1, chr)
   })
-  
+
   observeEvent(input$applyProposedTable1, {
     print("Applying proposed to overall")
     state$table1 <- mutate(state$table1, overall_bias = proposed) %>%
-            mutate(proposed = 
+            mutate(proposed =
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
   })
-  
+
   observeEvent(input$unsetKnowns, {
     print("unsetting")
     state$table1 <- mutate(state$table1, known_unknowns = 0) %>%
-            mutate(proposed = 
+            mutate(proposed =
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
   })
-  
+
   observeEvent(input$unsetUnknowns, {
     print("usetting")
     state$table1 <- mutate(state$table1, unknown_unknowns = 0) %>%
-            mutate(proposed = 
+            mutate(proposed =
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
   })
-  
+
   observeEvent(input$setKnownsUndetected, {
     print("setting to No bias detected")
     state$table1 <- mutate(state$table1, known_unknowns = 1) %>%
-            mutate(proposed = 
+            mutate(proposed =
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
   })
-  
+
   observeEvent(input$setUnknownsUndetected, {
     print("setting to No bias detected")
     state$table1 <- mutate(state$table1, unknown_unknowns = 1) %>%
-            mutate(proposed = 
+            mutate(proposed =
                    mapply(proposeTable1Overall,known_unknowns, unknown_unknowns)
                    )
   })
-  
+
   output$table2Header <- renderUI({
    validate(need(state$nma != "", "netmeta not ready")
            , need(nrow(state$table1)!="0","table1 empty"))
@@ -932,7 +930,7 @@ Unobserved"
         actionButton("applyProposedTable2", tags$b(style="color:blue","Use algorithm to calculate overall risk of bias judgements"))
       )
   })
-  
+
   output$table1Header <- renderUI({
    validate(need(state$nma != "", "netmeta not ready")
            , need(nrow(state$table1)!="0","table1 empty"))
@@ -944,9 +942,9 @@ Unobserved"
         actionButton("applyProposedTable1", tags$b(style="color:blue","Use algorithm to calculate overall bias"))
       )
   })
-  
+
  output$messages <- renderText({state$error})
- 
+
  output$bhOptions <- renderUI({
     if(state$analysisStarted == F ){
       chs = c("Desirable" = "good",
@@ -954,7 +952,7 @@ Unobserved"
     }else{
       if(state$inputBH == "good"){
         chs = c("Desirable" = "good")
-        
+
       }else{
         chs = c("Undesirable" = "bad")
       }
@@ -982,19 +980,19 @@ Unobserved"
                 choices = chs
                 )
   })
-  
+
   output$ref <- renderUI({
     if(state$analysisStarted == F ){
       chs = state$treatments
     }else{
       chs = state$inputRef
     }
-    radioButtons(inputId = "inputRef", 
+    radioButtons(inputId = "inputRef",
                  label = "Choose the reference treatment",
                  selected = state$inputRef,
                  choices = chs)
-  }) 
-  
+  })
+
   output$bugsnetOptions <- renderUI({
     if(state$analysisStarted == F ){
       bin = state$burnin
@@ -1030,7 +1028,7 @@ Unobserved"
       )
     }
   })
-  
+
  output$DataSummary <- renderUI({
     validate(
       need(state$analysisStarted == T, "Analysis parameters not set")
@@ -1046,7 +1044,7 @@ Unobserved"
              tableOutput("compinfo")
              )
  })
- 
+
  #set parameter
  observe({
     validate(
@@ -1058,21 +1056,21 @@ Unobserved"
    print("parameters set")
     state$parametersSet <- T
  })
- 
+
  observeEvent(input$inputSM,{
      print("seting state$inputSM")
      state$inputSM <- input$inputSM
    }
  )
- 
+
  observeEvent(input$numIter,
     state$numIter <- input$numIter
  )
- 
+
  observeEvent(input$burnin,
     state$burnin <- input$burnin
  )
- 
+
  observeEvent(input$inputMod,
     state$inputMod <- input$inputMod
  )
@@ -1082,7 +1080,7 @@ Unobserved"
  observeEvent(input$inputBH,
     state$inputBH <- input$inputBH
  )
- 
+
  resetParameters <- reactive({
       state$parametersSet <- F
       state$inputSM <- ""
@@ -1101,7 +1099,7 @@ Unobserved"
      state$bnmr <- ""
      state$bnmrDone <- F
    })
- 
+
  #start analysis button
  output$setButton <- reactive({
    if(state$parametersSet == T &
@@ -1112,23 +1110,23 @@ Unobserved"
    }
    res
  })
- 
+
  output$unsetButton <- reactive({
    validate(need(state$analysisStarted == T, ""))
    res = "<button onclick='resetAnalysis()'>Reset Analysis</button>"
  })
- 
+
  observeEvent(input$startAnalysis,{
    print("starting analysis")
    state$analysisStarted <- T
  })
- 
+
  observeEvent(input$resetAnalysis,{
    print("reset analysis")
    resetParameters()
    resetAnalysis()
  })
- 
+
  output$sidePanel <- renderUI({
    tags$div(
    uiOutput("smOptions"),
@@ -1138,11 +1136,11 @@ Unobserved"
    uiOutput("bugsnetOptions")
    )
  })
- 
+
  output$bayesianNMA <- renderUI({
    validate(need(state$analysisStarted==T,"analysis not started"),
             need(state$bnmaDone == T, "waiting for analysis"))
-   
+
             tags$div(
               h4("Posterior medians and 95% Cr.I.", align = "center"),
               conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
@@ -1158,7 +1156,7 @@ Unobserved"
               h6(paste(state$inputSM, "and 95% credible intervals of treatment in the column versus treatment in the row"))
             )
  })
- 
+
  output$bayesianNMR <- renderUI({
  validate(need(state$bnmrDone == T, "waiting for analysis"))
    isolate({
@@ -1184,7 +1182,7 @@ Unobserved"
     )
    })
  })
- 
+
  output$mainPanel <- renderUI({
    if(state$analysisStarted == T){
                  tabsetPanel(
@@ -1193,11 +1191,11 @@ Unobserved"
                    tabPanel("Bayesian network meta-analysis", uiOutput("bayesianNMA")),
                    tabPanel("Bayesian network meta-regression", uiOutput("bayesianNMR")),
                    tabPanel("Funnel plots and test for small-study effects",
-                            tabPanel("Contour-enhanced funnel plots", 
+                            tabPanel("Contour-enhanced funnel plots",
                                      uiOutput("funnelplots")
                             )
                    ),
-                   tabPanel("Contribution matrix", 
+                   tabPanel("Contribution matrix",
                             tags$br(),   # line break
                             p("Each cell entry provides the percentage contribution that the direct comparison (column) makes to the calculation of the corresponding NMA relative treatment effect (row)."),
                             tags$br(),   # line break
@@ -1208,7 +1206,7 @@ Unobserved"
      tags$h4("analysis not started")
    }
 })
- 
+
   output$dataAnalysis <- renderUI({
     validate(need(myData() != '', "no dataset present"))
              sidebarLayout(
@@ -1224,12 +1222,12 @@ Unobserved"
                )
                )
   })
-  
+
  output$funnelplots <- renderUI({
    validate(need(state$nmaDone == T, "netmeta not ready")
            )
     if(state$hasFunnels==T){
-       sidebarLayout( 
+       sidebarLayout(
           sidebarPanel(checkboxInput(inputId = "NatRef", label = "Check box if there is a natural reference treatment"),
                                                width = 3),
           mainPanel(
@@ -1257,8 +1255,8 @@ Unobserved"
    validate(need(state$analysisStarted==F,"Analysis already started. Please refresh page if you need to upload new data"))
      sidebarLayout(
        sidebarPanel(
-         fileInput("file1", "Choose CSV file", 
-                   accept = c("text/csv", 
+         fileInput("file1", "Choose CSV file",
+                   accept = c("text/csv",
                               "text/comma-separated-values,text/plain",
                               ".csv")),
          width = 3
@@ -1266,7 +1264,7 @@ Unobserved"
        mainPanel(
          tabsetPanel(
            tabPanel("Instructions",      # section division
-                    tags$h4("This tab provides instructions for", tags$b("long format"), "data, where each row contains one treatment arm", tags$u("for all studies identified in the systematic review, including those not reporting the outcome of interest."), "Please follow the steps below."), 
+                    tags$h4("This tab provides instructions for", tags$b("long format"), "data, where each row contains one treatment arm", tags$u("for all studies identified in the systematic review, including those not reporting the outcome of interest."), "Please follow the steps below."),
                     tags$br(),   # line break
                     tags$h5("The long format data file should contain five columns (for binary data) or six columns (for continuous data) labelled as follows:"),
                     tags$ul(
@@ -1292,55 +1290,66 @@ Unobserved"
 
 
 
-ui <- fluidPage(
-  theme=shinytheme("yeti"),
-  titlePanel(tags$b("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis")),
-  tags$script(src = "tables.js") ,
-  tags$head(tags$style(HTML(mycss))),
-  
-  tags$div(uiOutput("messages")),
-  tabsetPanel(
-    tabPanel("Load data", uiOutput("loaddata"),
-             tags$footer("Please cite ROB-MEN as", tags$i("Chiocchia V. et al. ROB-MEN: a tool to assess risk of bias due to missing evidence in network meta-analysis. BMC Med 19, 304 (2021)."), tags$a(href="https://doi.org/10.1186/s12916-021-02166-3", "DOI: 10.1186/s12916-021-02166-3"),
-                         tags$br(), "ROB-MEN is distributed, in the hope that it will be useful but without any warranty, under the ", tags$a(href='LICENSE.txt', target='blank', 'GNU General Public License.', download = 'LICENSE.txt'), 
-                         "By using ROB-MEN you accept the ", tags$a(href="DISCLAIMER.txt", target="_blank", "DISCLAIMER.", download = "DISCLAIMER.txt"), align = "center", 
-                         style = "position:absolute;
-                                  bottom:0;
-                                  width:100%;
-                                  height:75px;
-                                  color: darkblue;
-                                  background: white;
-                                  padding: 10px;
-                                  z-index: 1000;"),
-             tags$footer(tags$img(src = "Asset 2@3x.png", width = "225px", height = "75px"), align = "right",
-                         style = "position:absolute;
-                                  bottom:0;
-                                  z-index: 1000;"),
-             tags$footer(tags$img(src = "Asset 2@2x.png", width = "87px", height = "75px"), align = "right",
-                         style = "position:absolute;
-                                  bottom:0;
-                                  right:0;
-                                  z-index: 1000;"),
+ui <- tags$div(id="wrapper",
+  fluidPage(
+    tags$head(
+      tags$style(HTML("#wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container-fluid { flex-grow: 1; }"
+        ))
     ),
-    
-    tabPanel("Data analysis",
-                   uiOutput("dataAnalysis")
-             ),
+    titlePanel(tags$b("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis")),
+    tags$script(src = "tables.js") ,
+    tags$head(tags$style(HTML(mycss))),
 
-    tabPanel( "Pairwise Comparison Table"
-            , uiOutput("table1Header")
-            , tabPanel("View data", DT::dataTableOutput('table1'))
-            , downloadButton('table1download', 'Download Table 1')
-            ),
-    
-    tabPanel("ROB-MEN Table"
-            , uiOutput("table2Header")
-            , tabPanel("View data", DT::dataTableOutput('table2'))
-            , downloadButton('table2download', 'Download Table 2')
+    tags$div(uiOutput("messages")),
+    tabsetPanel(
+      tabPanel("Load data", uiOutput("loaddata"),
+      ),
+
+      tabPanel("Data analysis",
+                     uiOutput("dataAnalysis")
+               ),
+
+      tabPanel( "Pairwise Comparison Table"
+              , uiOutput("table1Header")
+              , tabPanel("View data", DT::dataTableOutput('table1'))
+              , downloadButton('table1download', 'Download Table 1')
+              ),
+
+      tabPanel("ROB-MEN Table"
+              , uiOutput("table2Header")
+              , tabPanel("View data", DT::dataTableOutput('table2'))
+              , downloadButton('table2download', 'Download Table 2')
+      ),
     )
-            
-  )
-)
+  ), # end fluidPage
+  tags$footer(
+    tags$div(
+      tags$div(
+        tags$img(src = "snsf.png", width = "250px", height = "82px"),
+        style="float: left; width: 50%; text-align: center; padding: 10px 0"
+      ),
+      tags$div(
+        tags$img(src = "unibe.png", width = "250px", height = "82px"),
+        style="float: left; width: 50%; text-align: center; padding: 10px 0"
+      ),
+      tags$br(),
+      "Please cite ROB-MEN as", tags$i("Chiocchia V. et al. ROB-MEN: a tool to assess risk of bias due to missing evidence in network meta-analysis. BMC Med 19, 304 (2021)."), tags$a(href="https://doi.org/10.1186/s12916-021-02166-3", "DOI: 10.1186/s12916-021-02166-3"),
+      "ROB-MEN is distributed, in the hope that it will be useful but without any warranty, under the ", tags$a(href='LICENSE.txt', target='blank', 'GNU General Public License.', download = 'LICENSE.txt'),
+      "By using ROB-MEN you accept the ", tags$a(href="DISCLAIMER.txt", target="_blank", "DISCLAIMER.", download = "DISCLAIMER.txt"),
+      style="width:80%; margin: 0 auto;"
+    ),
+    style = "
+      flex-shrink: 0;
+      padding: 10px 0;
+      width:100%;
+      background: #f8f9fa;"
+  ),
+) # end wrapper
 
 
 shinyApp(ui = ui, server = server)
