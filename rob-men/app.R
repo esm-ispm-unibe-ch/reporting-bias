@@ -42,7 +42,7 @@ server <- function(input, output, session) {
                          , contr=NULL
                          , table2 = tibble()
                          , numIter = 10000
-                         , burnin = 2000
+                         , burnin = 1000
                          )
 
   myData <- reactive({state$allData$directs})
@@ -522,7 +522,7 @@ Unobserved"
       pw <- pairwise(treat=t, n=n, mean=mean, sd=sd, data = myData(), studlab = id)
     }
     return(netmeta(TE, seTE, treat1, treat2, studlab, data = pw, sm=sm, n1=n1, n2=n2,
-            comb.fixed = modelFixed, comb.random = modelRandom)
+            fixed = modelFixed, random = modelRandom)
            )
     }
     tryCatch({ res = getNMA(); res
@@ -813,23 +813,23 @@ Unobserved"
   }, ignoreInit=T, ignoreNULL = T)
 
   output$table1download <- downloadHandler(
-    filename = "table1.csv",       # name for the downloaded file with extension
+    filename = "table1.xlsx",       # name for the downloaded file with extension
     content = function(file) {
-      write.csv2(state$table1, file)
+      write.xlsx(state$table1, file)
     }
   )
 
   output$table2download <- downloadHandler(
-    filename = function() {paste("table2", ".csv")},       # name for the downloaded file with extension
+    filename = function() {paste("table2", ".xlsx")},       # name for the downloaded file with extension
     content = function(file) {
-      write.csv2(state$table2, file)
+      write.xlsx(state$table2, file)
     }
   )
 
   output$mydownload2 <- downloadHandler(
-    filename = function() {paste("conributionMatrix", ".xlsx")},       # name for the downloaded file with extension
+    filename = function() {paste("contributionMatrix", ".xlsx")},       # name for the downloaded file with extension
     content = function(file) {
-      write.xlsx(state$contr, file)
+      write.xlsx(state$contr, file, row.names = F)
     }
   )
   output$smOptions <- renderUI({
@@ -1003,7 +1003,7 @@ Unobserved"
           inputId = "burnin",
           label = "Burn In",
           value = bin,
-          min = 2000,
+          min = 1000,
           max = NA,
           step = NA,
           width = NULL
@@ -1275,7 +1275,11 @@ Unobserved"
                       tags$li(tags$i("(For binary data)"),"Column", tags$i(tags$b("r")), "containing the number of participants with the outcome of interest in each arm of the study.", tags$u("For studies not reporting the outcome of interest this should be empty or contain an asterisk")),
                       tags$li(tags$i("(For continuous data)"),"Column", tags$i(tags$b("mean")), "the mean value of the outcome in each arm of the study.", tags$u("For studies not reporting the outcome of interest this should be empty or contain an asterisk")),
                       tags$li(tags$i("(For continuous data)"),"Column", tags$i(tags$b("sd")), "the standard deviation of the outcome in each arm of the study.", tags$u("For studies not reporting the outcome of interest this should be empty or contain an asterisk"))
-                    )
+                    ),
+                    tags$br(),
+                    tags$h4("Demo dataset"),
+                    tags$h5("Click", tags$a(href='cad_detection.csv', target='blank', 'here', download = 'cad_detection.csv'), "to download the demo dataset: a network of non-invasive diagnostic modalities for the detection of coronary artery disease in patients with low risk acute coronary syndrome. ",
+                            tags$a(href="https://www.bmj.com/content/360/bmj.k504", "Siontis G C, et al. Outcomes of non-invasive diagnostic modalities for the detection of coronary artery disease: network meta-analysis of diagnostic randomised controlled trials. BMJ 2018; 360 :k504"))
                     ),
            tabPanel("View data", DT::dataTableOutput('contents'))
          ),
@@ -1301,7 +1305,7 @@ ui <- tags$div(id="wrapper",
         .container-fluid { flex-grow: 1; }"
         ))
     ),
-    titlePanel(tags$b("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis")),
+    titlePanel("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis"),
     tags$script(src = "tables.js") ,
     tags$head(tags$style(HTML(mycss))),
 
@@ -1317,13 +1321,13 @@ ui <- tags$div(id="wrapper",
       tabPanel( "Pairwise Comparison Table"
               , uiOutput("table1Header")
               , tabPanel("View data", DT::dataTableOutput('table1'))
-              , downloadButton('table1download', 'Download Table 1')
+              , downloadButton('table1download', 'Download Pairwise Comparison Table')
               ),
 
       tabPanel("ROB-MEN Table"
               , uiOutput("table2Header")
               , tabPanel("View data", DT::dataTableOutput('table2'))
-              , downloadButton('table2download', 'Download Table 2')
+              , downloadButton('table2download', 'Download ROB-MEN Table')
       ),
     )
   ), # end fluidPage
@@ -1338,7 +1342,7 @@ ui <- tags$div(id="wrapper",
         style="float: left; width: 50%; text-align: center; padding: 10px 0"
       ),
       tags$br(),
-      "Please cite ROB-MEN as", tags$i("Chiocchia V. et al. ROB-MEN: a tool to assess risk of bias due to missing evidence in network meta-analysis. BMC Med 19, 304 (2021)."), tags$a(href="https://doi.org/10.1186/s12916-021-02166-3", "DOI: 10.1186/s12916-021-02166-3"),
+      "Please cite ROB-MEN as", tags$i("Chiocchia V. et al. ROB-MEN: a tool to assess risk of bias due to missing evidence in network meta-analysis. BMC Med 19, 304 (2021)."), tags$a(href="https://doi.org/10.1186/s12916-021-02166-3", "DOI: 10.1186/s12916-021-02166-3. "),
       "ROB-MEN is distributed, in the hope that it will be useful but without any warranty, under the ", tags$a(href='LICENSE.txt', target='blank', 'GNU General Public License.', download = 'LICENSE.txt'),
       "By using ROB-MEN you accept the ", tags$a(href="DISCLAIMER.txt", target="_blank", "DISCLAIMER.", download = "DISCLAIMER.txt"),
       style="width:80%; margin: 0 auto;"
