@@ -820,14 +820,14 @@ Unobserved"
   )
 
   output$table2download <- downloadHandler(
-    filename = function() {paste("table2", ".xlsx")},       # name for the downloaded file with extension
+    filename = "table2.xlsx",       # name for the downloaded file with extension
     content = function(file) {
       write.xlsx(state$table2, file)
     }
   )
 
   output$mydownload2 <- downloadHandler(
-    filename = function() {paste("contributionMatrix", ".xlsx")},       # name for the downloaded file with extension
+    filename = "contributionMatrix.xlsx",
     content = function(file) {
       write.xlsx(state$contr, file, row.names = F)
     }
