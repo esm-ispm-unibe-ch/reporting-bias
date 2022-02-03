@@ -1328,7 +1328,7 @@ ui <- tags$div(id="wrapper",
               , uiOutput("table2Header")
               , tabPanel("View data", DT::dataTableOutput('table2'))
               , downloadButton('table2download', 'Download ROB-MEN Table')
-      ),
+      )
     )
   ), # end fluidPage
   tags$footer(
