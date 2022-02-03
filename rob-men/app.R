@@ -815,14 +815,14 @@ Unobserved"
   output$table1download <- downloadHandler(
     filename = "table1.csv",       # name for the downloaded file with extension
     content = function(file) {
-      write.csv(state$table1, file)
+      write.csv(state$table1, file, row.names=F)
     }
   )
 
   output$table2download <- downloadHandler(
     filename = "table2.csv",       # name for the downloaded file with extension
     content = function(file) {
-      write.csv(state$table2, file)
+      write.csv(state$table2, file, row.names=F)
     }
   )
 
