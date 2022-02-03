@@ -813,16 +813,16 @@ Unobserved"
   }, ignoreInit=T, ignoreNULL = T)
 
   output$table1download <- downloadHandler(
-    filename = "table1.xlsx",       # name for the downloaded file with extension
+    filename = "table1.csv",       # name for the downloaded file with extension
     content = function(file) {
-      write.xlsx(state$table1, file)
+      write.csv(state$table1, file)
     }
   )
 
   output$table2download <- downloadHandler(
-    filename = "table2.xlsx",       # name for the downloaded file with extension
+    filename = "table2.csv",       # name for the downloaded file with extension
     content = function(file) {
-      write.xlsx(state$table2, file)
+      write.csv(state$table2, file)
     }
   )
 
