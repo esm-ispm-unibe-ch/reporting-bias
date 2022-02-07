@@ -46,6 +46,7 @@ server <- function(input, output, session) {
                          )
 
   myData <- reactive({state$allData$directs})
+  dataset <- reactive({state$allData$alldata})
 
   observeEvent(input$file1,{
     state$allData <- allMyData(input$file1)
@@ -573,6 +574,7 @@ Unobserved"
       return(list( isBinary=isBinary
                  , directs=directs
                  , otherOutcomes=otherOutcomes
+                 , alldata=alldata
                  ))
     }
     tryCatch({
@@ -587,7 +589,7 @@ Unobserved"
   }
 
   output$contents <- DT::renderDataTable({
-    DT::datatable(myData())
+    DT::datatable(dataset())
   })
 
   output$summary <- renderPrint({
