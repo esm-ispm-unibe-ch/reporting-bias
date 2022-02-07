@@ -1304,7 +1304,7 @@ ui <- tags$div(id="wrapper",
             display: flex;
             flex-direction: column;
         }
-        .container-fluid { flex-grow: 1; }"
+        .container-fluid { flex-grow: 1; width: 100%; }"
         ))
     ),
     titlePanel("ROB-MEN: Risk Of Bias due to Missing Evidence in Network meta-analysis"),
@@ -1352,6 +1352,7 @@ ui <- tags$div(id="wrapper",
     style = "
       flex-shrink: 0;
       padding: 10px 0;
+      margin-top: 10px;
       width:100%;
       background: #f8f9fa;"
   ),
