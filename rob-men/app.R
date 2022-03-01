@@ -65,7 +65,7 @@ server <- function(input, output, session) {
   },ignoreNULL=T)
 
   observeEvent(state$analysisStarted, {
-    if(state$analysisStarted == T){
+    if(state$analysisStarted){
       print("starting NMA")
       state$nma <- nma(state$allData$directs, state$inputSM, state$modelFixed, state$modelRandom)
       state$nmaDone = T
@@ -550,7 +550,7 @@ Unobserved"
       continuousColumns = c("id","study","t","n","mean","sd")
       isBinary = all(lapply(binaryColumns, function(x){x %in% colnames(alldata)}))
       isContinuous = all(lapply(continuousColumns, function(x){x %in% colnames(alldata)}))
-      if(isBinary==T){
+      if(isBinary){
         alldata <- alldata %>%
           mutate(n = as.integer(n) ) %>%
            mutate(r = as.integer(r) )
@@ -559,7 +559,7 @@ Unobserved"
         otherOutcomes <- alldata %>%
           filter(is.na(r))
       }else{ # continuous
-        if(isContinuous==F){
+        if(!isContinuous){
           stop("missing columns or missmatching column names. Please refresh page")
         }
         alldata <- alldata %>%
@@ -631,7 +631,7 @@ Unobserved"
   output$intinfo <- renderTable({
     out <- btab()$intervention
     #Change here colnames
-    if(state$allData$isBinary==T){
+    if(state$allData$isBinary){
       colnames(out) <- c("Intervention","Total no. of studies", "Total no. of events", "Total no. of patients","Min observed event rate","Max observed event rate","Average event rate")
     }else{
       colnames(out) <- c("Intervention","Total no. of studies", "Total no. of patients","Min outcome value","Max outcome value","Average outcome value")
@@ -639,11 +639,12 @@ Unobserved"
     out
   })
   output$compinfo <- renderTable({
-    out <- btab()$comparison[,-5]
     #Change here colnames using the code from above
-    if(state$allData$isBinary==T){
+    if(state$allData$isBinary){
+      out <- btab()$comparison[,-5]
       colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients","Total no. of events")
     }else{
+      out <- btab()$comparison
       colnames(out) <- c("Comparison","Total no. of studies", "Total no. of patients")
     }
     out
@@ -835,8 +836,8 @@ Unobserved"
     }
   )
   output$smOptions <- renderUI({
-    if(state$allData$isBinary==T){
-      if(state$analysisStarted == F ){
+    if(state$allData$isBinary){
+      if(!state$analysisStarted ){
         chs = c("Odds Ratio" = "OR",
                 "Risk Ratio" = "RR")
       }else{
@@ -847,7 +848,7 @@ Unobserved"
                   selected = state$inputSM,
                   )
     }else{
-      if(state$analysisStarted == F ){
+      if(!state$analysisStarted){
         chs = c("Mean difference" = "MD",
                "Standardized mean difference" = "SMD")
       }else{
@@ -948,7 +949,7 @@ Unobserved"
  output$messages <- renderText({state$error})
 
  output$bhOptions <- renderUI({
-    if(state$analysisStarted == F ){
+    if(!state$analysisStarted){
       chs = c("Desirable" = "good",
               "Undesirable" = "bad")
     }else{
@@ -966,7 +967,7 @@ Unobserved"
                 )
  })
  output$ModelOptions <- renderUI({
-    if(state$analysisStarted == F ){
+    if(!state$analysisStarted ){
       chs = c("Random effects" = "random",
               "Fixed effects" = "fixed")
     }else{
@@ -984,7 +985,7 @@ Unobserved"
   })
 
   output$ref <- renderUI({
-    if(state$analysisStarted == F ){
+    if(!state$analysisStarted ){
       chs = state$treatments
     }else{
       chs = state$inputRef
@@ -996,7 +997,7 @@ Unobserved"
   })
 
   output$bugsnetOptions <- renderUI({
-    if(state$analysisStarted == F ){
+    if(!state$analysisStarted ){
       bin = state$burnin
       iter = state$numIter
       tags$div(
@@ -1007,7 +1008,7 @@ Unobserved"
           value = bin,
           min = 1000,
           max = NA,
-          step = NA,
+          step = 100,
           width = NULL
         ),
         numericInput(
@@ -1016,7 +1017,7 @@ Unobserved"
           value = iter,
           min = 10000,
           max = NA,
-          step = 10,
+          step = 1000,
           width = NULL
         )
       )
@@ -1104,8 +1105,8 @@ Unobserved"
 
  #start analysis button
  output$setButton <- reactive({
-   if(state$parametersSet == T &
-      state$analysisStarted == F){
+   if(state$parametersSet &
+      !state$analysisStarted ){
      res = "<button onclick='startAnalysis()'>Start Analysis</button>"
    }else{
     res=""
@@ -1186,7 +1187,7 @@ Unobserved"
  })
 
  output$mainPanel <- renderUI({
-   if(state$analysisStarted == T){
+   if(state$analysisStarted){
                  tabsetPanel(
                    tabPanel("Data Summary",uiOutput("DataSummary")),
                    tabPanel("Frequentist network meta-analysis", verbatimTextOutput("summary")),
@@ -1228,7 +1229,7 @@ Unobserved"
  output$funnelplots <- renderUI({
    validate(need(state$nmaDone == T, "netmeta not ready")
            )
-    if(state$hasFunnels==T){
+    if(state$hasFunnels){
        sidebarLayout(
           sidebarPanel(checkboxInput(inputId = "NatRef", label = "Check box if there is a natural reference treatment"),
                                                width = 3),

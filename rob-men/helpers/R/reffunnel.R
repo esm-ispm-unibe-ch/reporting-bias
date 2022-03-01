@@ -33,7 +33,7 @@ reffunnel <- function (nma, small.values = "good", ref)
     }
   }
   else {
-    ma <- metagen(nma$TE, nma$seTE, subset = nma$treat1 == ref || nma$treat2 == ref, sm = sm)
+    ma <- metagen(nma$TE, nma$seTE, subset = nma$treat1 == ref || nma$treat2 == ref, sm = nma$sm)
     if(ma$k<10){
       return(NULL)
     }else{
