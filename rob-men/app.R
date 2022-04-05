@@ -678,7 +678,7 @@ Unobserved"
     validate(need(state$nmaDone == T, "netmeta not ready")
             )
     print("calculating NMRdata")
-    newdata <- pooledVar(state$nma, myData())
+    newdata <- pool_variances(state$nma, myData())
     state$NMRdata <- data.prep(arm.data = newdata,
               varname.t = "t",
               varname.s = "id")
