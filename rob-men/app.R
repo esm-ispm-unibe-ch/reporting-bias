@@ -755,10 +755,10 @@ Unobserved"
           xlab("Study variance of the (linear) treatment effect") +
           ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
       })
-      output$nmrplotD <- downloadHandler(
+      output$nmrplotD <- downloadHandler(            # DOES NOT WORK
         filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
         content = function(file) {
-          pdf(file, width = 10)
+          pdf(file)
           nma.regplot(state$bnmr) +
             xlab("Study variance of the (linear) treatment effect") +
             ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
