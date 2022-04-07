@@ -592,10 +592,6 @@ Unobserved"
     DT::datatable(dataset())
   })
 
-  output$summary <- renderPrint({
-    summary(state$nma)
-  })
-
   getNMA <- reactive({
     validate(
       need(state$nma != "", "netmeta not ready")
@@ -665,6 +661,10 @@ Unobserved"
         BUGSnet::nma.forest(state$bnma, comparator = state$inputRef) +
           ylab(paste(input$inputSM, "relative to", input$inputRef )) +
           theme(axis.text = element_text(size=15))
+      })
+      
+      output$tau <- renderText({
+        round(mean(c(mean(state$bnma$samples[1][[1]][,"sigma"]), mean(state$bnma$samples[2][[1]][,"sigma"]))),3)
       })
 
       output$league <- renderTable({
@@ -1151,6 +1151,8 @@ Unobserved"
                                tags$div("Please wait. The calculations of network meta-analysis may take up to several minutes.",id="loadmessage5")),
               div(plotOutput("forest", height = "500px", width = "800px"), align = "center"),
               br(),
+              h5("The heterogeneity (tau) is estimated at ", textOutput("tau", inline = T)),
+              br(),
               h4("League table", align = "center"),
               conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                                tags$div(id = "plot-container6", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner2")),
@@ -1190,7 +1192,6 @@ Unobserved"
    if(state$analysisStarted){
                  tabsetPanel(
                    tabPanel("Data Summary",uiOutput("DataSummary")),
-                   tabPanel("Frequentist network meta-analysis", verbatimTextOutput("summary")),
                    tabPanel("Bayesian network meta-analysis", uiOutput("bayesianNMA")),
                    tabPanel("Bayesian network meta-regression", uiOutput("bayesianNMR")),
                    tabPanel("Funnel plots and test for small-study effects",
