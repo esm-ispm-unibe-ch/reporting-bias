@@ -701,7 +701,7 @@ Unobserved"
                          link=ifelse(state$inputSM=="OR","logit", "log"),
                          effects= input$inputMod,
                          covariate = "varStudies",
-                         prior.beta = "UNRELATED")
+                         prior.beta = input$inputBeta)
     else model <- BUGSnet::nma.model(data=state$NMRdata,
                             outcome="mean",
                             sd="sd",
@@ -711,7 +711,7 @@ Unobserved"
                             link="identity",
                             effects= input$inputMod,
                             covariate = "varStudies",
-                            prior.beta = "UNRELATED")
+                            prior.beta = input$inputBeta)
   state$bnmr <- BUGSnet::nma.run(model,
                                  n.burnin=state$burnin,
                                  n.iter=state$numIter,
@@ -741,6 +741,20 @@ Unobserved"
         nma.diag(state$bnmr,plot_prompt = F)$gelman.rubin$psrf[,-2]
       }, rownames = T, colnames = F)
 
+      
+      output$coefficients <- renderTable({
+        if(state$inputBeta=="UNRELATED"){
+          c1 <- state$bnmr$samples[1][[1]][,grep("beta",colnames(state$bnmr$samples[1][[1]]))]
+          c2 <- state$bnmr$samples[2][[1]][,grep("beta",colnames(state$bnmr$samples[2][[1]]))]
+          coef <- colMeans(rbind(c1, c2))
+        }else{
+          c1 <- state$bnmr$samples[1][[1]][,grep("beta",colnames(state$bnmr$samples[1][[1]]))]
+          c2 <- state$bnmr$samples[2][[1]][,grep("beta",colnames(state$bnmr$samples[2][[1]]))]
+          coef <- mean(rbind(c1, c2))
+        }
+        coef
+      }, rownames = T, colnames = F)
+      
       output$tracedownload <- downloadHandler(
         filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
         content = function(file) {
@@ -856,7 +870,7 @@ Unobserved"
       }
      radioButtons(inputId = "inputSM", label = "Summary measure",
                   choices = chs,
-                  selected = state$inputSM,
+                  selected = state$inputSM
                   )
     }else{
       if(!state$analysisStarted){
@@ -1042,6 +1056,23 @@ Unobserved"
       )
     }
   })
+  output$priorbeta <- renderUI({
+    if(!state$analysisStarted ){
+      chs = c("Unrelated treatment-specific interactions" = "UNRELATED",
+              "Exchangeable/related treatment-specific interactions" = "EXCHANGEABLE")
+    }else{
+      if(state$inputBeta == "UNRELATED") {
+        chs = c("Unrelated treatment-specific interactions" = "UNRELATED")
+      }else{
+        chs = c("Exchangeable/related treatment-specific interactions" = "EXCHANGEABLE")
+      }
+    }
+    radioButtons(inputId = "inputBeta",
+                 label = "Assumption for treatment-specific interactions",
+                 selected = state$inputBeta,
+                 choices = chs
+    )
+  })
 
  output$DataSummary <- renderUI({
     validate(
@@ -1065,7 +1096,8 @@ Unobserved"
       need(state$inputSM != "", "SM not selected"),
       need(state$inputMod != "", "Model not selected"),
       need(state$inputRef != "", "Reference not selected"),
-      need(state$inputBH != "", "Value direction not selected")
+      need(state$inputBH != "", "Value direction not selected"),
+      need(state$inputBeta != "", "Assumption coefficients not selected")
     )
    print("parameters set")
     state$parametersSet <- T
@@ -1094,6 +1126,8 @@ Unobserved"
  observeEvent(input$inputBH,
     state$inputBH <- input$inputBH
  )
+ observeEvent(input$inputBeta,
+    state$inputBeta <- input$inputBeta)
 
  resetParameters <- reactive({
       state$parametersSet <- F
@@ -1147,7 +1181,8 @@ Unobserved"
    uiOutput("bhOptions"),
    uiOutput("ModelOptions"),
    uiOutput("ref"),
-   uiOutput("bugsnetOptions")
+   uiOutput("bugsnetOptions"),
+   uiOutput("priorbeta")
    )
  })
 
@@ -1181,8 +1216,9 @@ Unobserved"
       p("Check the trace plots and the Gelman-Rubin diagnostic values being close to 1 for convergence. If needed, increase number of iterations and burn-in and rerun analysis"),
       div(tableOutput("rhat"), align= "center"),
       downloadButton('tracedownload', 'Download Trace Plots as PDF'),
-      #div(plotOutput("rhatPlots", height = "500px", width = "800px"), align = "center"),
       h4("Network meta-regression for variance of the (linear) treatment effect", align = "center"),
+      p("Values of the regression coefficients (betas) representing the additional (interaction) treatment effect in comparisons to treatment 1 (reference)"),
+      div(tableOutput("coefficients"), align= "center"),
       p("Each line shows how the linear effect of each treatment versus reference changes for different study variances.
         The value at variance 0 are the extrapolated linear effects of each treatment versus reference for an imaginary study with 0 variance."),
       conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
@@ -1327,7 +1363,7 @@ ui <- tags$div(id="wrapper",
 
     tags$div(uiOutput("messages")),
     tabsetPanel(
-      tabPanel("Load data", uiOutput("loaddata"),
+      tabPanel("Load data", uiOutput("loaddata")
       ),
 
       tabPanel("Data analysis",
@@ -1369,7 +1405,7 @@ ui <- tags$div(id="wrapper",
       margin-top: 10px;
       width:100%;
       background: #f8f9fa;"
-  ),
+  )
 ) # end wrapper
 
 
