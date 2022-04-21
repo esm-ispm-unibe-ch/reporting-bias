@@ -753,7 +753,7 @@ Unobserved"
           coef <- mean(rbind(c1, c2))
         }
         coef
-      }, rownames = T, colnames = F)
+      }, rownames = ifelse(state$inputBeta=="UNRELATED", T, F), colnames = F)
       
       output$tracedownload <- downloadHandler(
         filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
@@ -1213,11 +1213,11 @@ Unobserved"
    isolate({
     tags$div(
       h4("Checks for convergence of network meta-regression model", align = "center"),
-      p("Check the trace plots and the Gelman-Rubin diagnostic values being close to 1 for convergence. If needed, increase number of iterations and burn-in and rerun analysis"),
+      p("Check the trace plots (download) and the Gelman-Rubin diagnostic values (table below) being close to 1 for convergence. If needed, increase number of iterations and burn-in or change the assumption for treatment-specific interactions to 'Exchangeable' and rerun analysis"),
       div(tableOutput("rhat"), align= "center"),
       downloadButton('tracedownload', 'Download Trace Plots as PDF'),
       h4("Network meta-regression for variance of the (linear) treatment effect", align = "center"),
-      p("Values of the regression coefficients (betas) representing the additional (interaction) treatment effect in comparisons to treatment 1 (reference)"),
+      p(ifelse(state$inputBeta=="UNRELATED", "Values of the regression coefficients (betas) representing the additional (interaction) treatment effect in comparisons to treatment 1 (reference)", "Average value of the regression coefficients (betas) representing the additional (interaction) treatment effect in comparisons to treatment 1 (reference)")),
       div(tableOutput("coefficients"), align= "center"),
       p("Each line shows how the linear effect of each treatment versus reference changes for different study variances.
         The value at variance 0 are the extrapolated linear effects of each treatment versus reference for an imaginary study with 0 variance."),
@@ -1288,7 +1288,7 @@ Unobserved"
               dataTableOutput("fptable")),
             hr(),
             fluidRow(
-              tags$h4("Only the first six contour-enhanced funnel plots are shown here. To view all plots, press the button below to download them as PDF."),
+              tags$h4("Only some funnel plots are shown here. To view all plots, press the button below to download them as PDF."),
               plotOutput("plot2"),
               downloadButton('mydownload', 'Download Plots as PDF'),
               conditionalPanel("input.NatRef",
