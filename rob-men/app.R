@@ -1264,8 +1264,7 @@ Unobserved"
    validate(need(state$nmaDone == T, "netmeta not ready")
            )
     if(state$hasFunnels){
-       sidebarLayout(
-          mainPanel(
+          fluidPage(
             fluidRow(
               verbatimTextOutput("fpprint"),
               dataTableOutput("fptable")),
@@ -1281,11 +1280,11 @@ Unobserved"
               )
             )
           )
-       )
     }else{
       tags$h3("All comparisons have fewer than 10 studies")
     }
    })
+ 
  output$loaddata <- renderUI({
    validate(need(state$analysisStarted==F,"Analysis already started. Please refresh page if you need to upload new data"))
      sidebarLayout(
