@@ -815,21 +815,6 @@ Unobserved"
     },
     contentType = 'pdf')
 
-  reffp <- function() {
-      reffunnel(state$nma, small.values = state$inputBH, ref=state$inputRef)
-  }
-
-  output$refprint <- renderPrint({
-    validate(need(!is.null(reffp())
-                 , "There is no comparison including the reference treatment with more than 10 studies"))
-  })
-
-  output$refplot <- renderPlot({
-   validate(need(!is.null(reffp())
-                 , "There is no comparison including the reference treatment with more than 10 studies"))
-     reffp()
-  })
-
   observeEvent(state$bnmrDone, {
     validate(need(state$analysisStarted == T, "Analysis not started"),
              need(state$bnmrDone == T, "bnmr not Done"))
@@ -1217,7 +1202,7 @@ Unobserved"
       div(tableOutput("rhat"), align= "center"),
       downloadButton('tracedownload', 'Download Trace Plots as PDF'),
       h4("Network meta-regression for variance of the (linear) treatment effect", align = "center"),
-      p(ifelse(state$inputBeta=="UNRELATED", "Values of the regression coefficients (betas) representing the additional (interaction) treatment effect in comparisons to treatment 1 (reference)", "Average value of the regression coefficients (betas) representing the additional (interaction) treatment effect in comparisons to treatment 1 (reference)")),
+      p(ifelse(state$inputBeta=="UNRELATED", "Values of the coefficients (betas) in the regression model between relative treatment effects and study variance", "Average value of the coefficients (betas) in the regression model between relative treatment effects and study variance")),
       div(tableOutput("coefficients"), align= "center"),
       p("Each line shows how the linear effect of each treatment versus reference changes for different study variances.
         The value at variance 0 are the extrapolated linear effects of each treatment versus reference for an imaginary study with 0 variance."),
@@ -1280,8 +1265,6 @@ Unobserved"
            )
     if(state$hasFunnels){
        sidebarLayout(
-          sidebarPanel(checkboxInput(inputId = "NatRef", label = "Check box if there is a natural reference treatment"),
-                                               width = 3),
           mainPanel(
             fluidRow(
               verbatimTextOutput("fpprint"),
