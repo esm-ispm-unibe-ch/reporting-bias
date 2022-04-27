@@ -743,20 +743,18 @@ Unobserved"
 
       
       output$coefficients <- renderTable({
-        if(state$inputBeta=="UNRELATED"){
           c1 <- state$bnmr$samples[1][[1]][,grep("beta",colnames(state$bnmr$samples[1][[1]]))]
           c2 <- state$bnmr$samples[2][[1]][,grep("beta",colnames(state$bnmr$samples[2][[1]]))]
+        if(state$inputBeta=="UNRELATED"){
           coef <- colMeans(rbind(c1, c2))
         }else{
-          c1 <- state$bnmr$samples[1][[1]][,grep("beta",colnames(state$bnmr$samples[1][[1]]))]
-          c2 <- state$bnmr$samples[2][[1]][,grep("beta",colnames(state$bnmr$samples[2][[1]]))]
           coef <- mean(rbind(c1, c2))
         }
         coef
       }, rownames = ifelse(state$inputBeta=="UNRELATED", T, F), colnames = F)
       
       output$tracedownload <- downloadHandler(
-        filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
+        filename = "traceplots.pdf",       # name for the downloaded file with extension
         content = function(file) {
           pdf(file)
           nma.diag(state$bnmr,plot_prompt = F)
@@ -769,8 +767,8 @@ Unobserved"
           xlab("Study variance of the (linear) treatment effect") +
           ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
       })
-      output$nmrplotD <- downloadHandler(            # DOES NOT WORK
-        filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
+      output$nmrplotD <- downloadHandler(            # TODO: fix pdf, download works but pdf won't open as it has no pages
+        filename = "nmrPlot.pdf",      
         content = function(file) {
           pdf(file)
           nma.regplot(state$bnmr) +
@@ -807,7 +805,7 @@ Unobserved"
   })
 
   output$mydownload <- downloadHandler(
-    filename = function() {paste("", ".pdf")},       # name for the downloaded file with extension
+    filename = "funnelPlots.pdf",       # name for the downloaded file with extension
     content = function(file) {
       pdf(file)
       fp()
@@ -1272,12 +1270,7 @@ Unobserved"
             fluidRow(
               tags$h4("Only some funnel plots are shown here. To view all plots, press the button below to download them as PDF."),
               plotOutput("plot2"),
-              downloadButton('mydownload', 'Download Plots as PDF'),
-              conditionalPanel("input.NatRef",
-                               plotOutput("refplot"),
-                               verbatimTextOutput("refprint"),
-                               width = 12
-              )
+              downloadButton('mydownload', 'Download Plots as PDF')
             )
           )
     }else{
