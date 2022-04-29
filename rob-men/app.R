@@ -767,16 +767,17 @@ Unobserved"
           xlab("Study variance of the (linear) treatment effect") +
           ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
       })
-      output$nmrplotD <- downloadHandler(            # TODO: fix pdf, download works but pdf won't open as it has no pages
-        filename = "nmrPlot.pdf",      
-        content = function(file) {
-          pdf(file)
-          nma.regplot(state$bnmr) +
-            xlab("Study variance of the (linear) treatment effect") +
-            ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
-          dev.off()
-        },
-        contentType = 'pdf')
+      # TODO: fix pdf, download works but pdf won't open as it has no pages
+      # output$nmrplotD <- downloadHandler(            
+      #   filename = "nmrPlot.pdf",      
+      #   content = function(file) {
+      #     pdf(file)
+      #     nma.regplot(state$bnmr) +
+      #       xlab("Study variance of the (linear) treatment effect") +
+      #       ylab(paste("Treatment effect (linear scale) versus", input$inputRef))
+      #     dev.off()
+      #   },
+      #   contentType = 'pdf')
       
       output$minvar <- renderText({
         min(state$NMRdata$arm.data$varStudies)
@@ -1208,7 +1209,7 @@ Unobserved"
                        tags$div(id = "plot-container1", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner1")),
                        tags$div("Please wait. The calculations of network meta-regression may take up to several minutes.",id="loadmessage1")),
       div(plotOutput("nmrplot", height = "500px", width = "800px"), align = "center"),
-      downloadButton('nmrplotD', 'Download Regression Plot as PDF'),
+      #downloadButton('nmrplotD', 'Download Regression Plot as PDF'),
       h4("League table", align = "center"),
       conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
                        tags$div(id = "plot-container2", tags$img(src = "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif", id = "loading-spinner2")),
