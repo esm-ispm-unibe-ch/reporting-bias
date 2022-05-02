@@ -435,8 +435,8 @@ Unobserved"
         th(rowspan = 2, 'Pairwise comparison'),
         th(rowspan = 2, 'group'),
         th(colspan = 2, 'Number of studies in each comparison'),
-        th(colspan = 1, 'Within study assessment of bias'),
-        th(colspan = 1, 'Across study assessment of bias'),
+        th(colspan = 1, 'Within-study assessment of bias'),
+        th(colspan = 1, 'Across-study assessment of bias'),
         th(colspan = 1, 'Overall bias')
       ),tr(
         th(colspan = 1, 'Reporting this outcome (sample size)'),
