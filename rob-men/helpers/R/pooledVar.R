@@ -13,16 +13,28 @@ pool_variances <- function(nma, data) {
   pooled <- sapply(nma$studies[to.calculate], function(study_id){
                                               calculate_pooled_variance(nma, study_id)
                                         })
-  pooled <- data.frame(id_multi = as.numeric(names(pooled)), pooled_var = pooled)
-  to.join <- nma$data %>%         # get id and var only for two-arm studies to merge with data
-    select(studlab, var) %>%
-    mutate(studlab = as.numeric(studlab)) %>%
-    group_by(studlab) %>%
-    filter(n() == 1)
-  data <- data %>% dplyr::left_join(pooled, by = c("id" = "id_multi")) %>%
-    left_join(to.join, by = c("id" = "studlab")) %>%
-    mutate(varStudies = coalesce(pooled_var, var)) %>%  # TODO: give a meaningful name to new column
-    select(-c(var, pooled_var))
+  if(any(nma$n.arms>2)){
+    pooled <- data.frame(id_multi = as.numeric(names(pooled)), pooled_var = pooled)
+    to.join <- nma$data %>%         # get id and var only for two-arm studies to merge with data
+      select(studlab, var) %>%
+      mutate(studlab = as.numeric(studlab)) %>%
+      group_by(studlab) %>%
+      filter(n() == 1)
+    data <- data %>% dplyr::left_join(pooled, by = c("id" = "id_multi")) %>%
+      left_join(to.join, by = c("id" = "studlab")) %>%
+      mutate(varStudies = coalesce(pooled_var, var)) %>%  # TODO: give a meaningful name to new column
+      select(-c(var, pooled_var))
+  }else{
+    to.join <- nma$data %>%         # get id and var only for two-arm studies to merge with data
+      select(studlab, var) %>%
+      mutate(studlab = as.numeric(studlab)) %>%
+      group_by(studlab) %>%
+      filter(n() == 1)
+    data <- data %>% dplyr::left_join(to.join, by= c("id" = "studlab")) %>%
+      mutate(varStudies = var) %>%  # TODO: give a meaningful name to new column
+      select(-c(var))
+  }
+  
   return(data)
   
 #  data <- cbind(data, varStudies=rep(nma$data[!duplicated(nma$data$studlab), "var"], times = nma$narms))
