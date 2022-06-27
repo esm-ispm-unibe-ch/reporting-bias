@@ -858,8 +858,8 @@ Unobserved"
                   )
     }else{
       if(!state$analysisStarted){
-        chs = c("Mean difference" = "MD",
-               "Standardized mean difference" = "SMD")
+        chs = c(#"Standardized mean difference" = "SMD",
+               "Mean difference" = "MD")
       }else{
         chs = state$inputSM
       }
@@ -1162,6 +1162,9 @@ Unobserved"
  output$sidePanel <- renderUI({
    tags$div(
    uiOutput("smOptions"),
+   if(state$allData$isBinary==F) {
+     strong("NOTE: currently ROB-MEN cannot calculate standardised mean differences.", style = "color:blue")
+     },
    uiOutput("bhOptions"),
    uiOutput("ModelOptions"),
    uiOutput("ref"),
