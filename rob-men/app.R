@@ -1310,7 +1310,11 @@ Unobserved"
                     tags$br(),
                     tags$h4("Demo dataset"),
                     tags$h5("Click", tags$a(href='cad_detection.csv', target='blank', 'here', download = 'cad_detection.csv'), "to download the demo dataset: a network of non-invasive diagnostic modalities for the detection of coronary artery disease in patients with low risk acute coronary syndrome. ",
-                            tags$a(href="https://www.bmj.com/content/360/bmj.k504", "Siontis G C, et al. Outcomes of non-invasive diagnostic modalities for the detection of coronary artery disease: network meta-analysis of diagnostic randomised controlled trials. BMJ 2018; 360 :k504"))
+                            tags$a(href="https://www.bmj.com/content/360/bmj.k504", "Siontis G C, et al. Outcomes of non-invasive diagnostic modalities for the detection of coronary artery disease: network meta-analysis of diagnostic randomised controlled trials. BMJ 2018; 360 :k504")
+                            ),
+                    tags$br(),
+                    tags$h4("Training material"),
+                    tags$h5("For more information on how to use the ROB-MEN app, watch the", tags$a(href="https://training.cochrane.org/resource/rob-men-tool-to-evaluate-risk-of-bias", "Cochrane Learning Live webinar videos"))
                     ),
            tabPanel("View data", DT::dataTableOutput('contents'))
          ),
